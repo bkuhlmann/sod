@@ -16,6 +16,7 @@ end
 
 require "refinements"
 require "sod"
+require "tone/rspec/matchers/have_color"
 
 SPEC_ROOT = Pathname(__dir__).realpath.freeze
 
