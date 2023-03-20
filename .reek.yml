@@ -8,3 +8,6 @@ detectors:
       - "Sod::Context#respond_to_missing?"
   LongParameterList:
     enabled: false
+  ModuleInitialize:
+    exclude:
+      - "Sod::Models"
