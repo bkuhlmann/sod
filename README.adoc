@@ -2,28 +2,910 @@
 :toclevels: 5
 :figure-caption!:
 
+:cogger_link: link:https://alchemists.io/projects/cogger[Cogger]
+:dry_container_link: link:https://dry-rb.org/gems/dry-container[Dry Container]
+:etcher_link: link:https://alchemists.io/projects/etcher[Etcher]
+:gemsmith_link: link:https://alchemists.io/projects/gemsmith[Gemsmith]
+:git-lint_link: link:https://alchemists.io/projects/git-lint[Git Lint]
+:hanamismith_link: link:https://alchemists.io/projects/hanamismith[Hanamismith]
+:infusible_link: link:https://alchemists.io/projects/infusible[Infusible]
+:milestoner_link: link:https://alchemists.io/projects/milestoner[Milestoner]
+:option_parser_link: link:https://rubyapi.org/o/s?q=OptionParser[Option Parser]
+:pennyworth_link: link:https://alchemists.io/projects/pennyworth[Pennyworth]
+:pragmater_link: link:https://alchemists.io/projects/pragmater[Pragmater]
+:rake_link: link:https://github.com/ruby/rake[Rake]
+:rubysmith_link: link:https://alchemists.io/projects/rubysmith[Rubysmith]
+:runcom_link: link:https://alchemists.io/projects/runcom[Runcom]
+:spek_link: link:https://alchemists.io/projects/spek[Spek]
+:sublime_text_kit_link: link:https://alchemists.io/projects/sublime_text_kit[Sublime Text Kit]
+:tocer_link: link:https://alchemists.io/projects/tocer[Tocer]
+:tone_link: link:https://alchemists.io/projects/tone[Tone]
+:versionaire_link: link:https://alchemists.io/projects/versionaire[Versionaire]
+:xdg_link: link:https://alchemists.io/projects/xdg[XDG]
+
 = Sod
+
+Sod -- as in the ground upon which you stand -- provides a Domain Specific Language (DSL) for creating reusable Command Line Interfaces (CLIs). This gem builds upon and enhances native {option_parser_link} behavior by smoothing out the rough edges you wish {option_parser_link} didn't have.
 
 toc::[]
 
 == Features
 
-== Screencasts
+- Builds upon and enhances native {option_parser_link} functionality.
+- Provides a simple DSL for composing reusable CLI commands and actions.
+- Provides a blank slate that is fully customizable to your needs.
+- Provides prefabricated commands and actions for quick setup and experimentation.
+- Uses {infusible_link} for function composition.
+- Uses {tone_link} for colorized documentation.
+- Uses {cogger_link} for colorized logging.
+
+== Screenshots
+
+*DSL*
+
+image::https://alchemists.io/images/projects/sod/screenshots/dsl.png[A screenshot of the DSL syntax,width=597,height=512,role=focal_point]
+
+*Output*
+
+image::https://alchemists.io/images/projects/sod/screenshots/output.png[A screenshot of the generated help documentation,width=473,height=500,role=focal_point]
 
 == Requirements
 
 . link:https://www.ruby-lang.org[Ruby].
+. Familiarity with {option_parser_link} syntax and behavior.
 
 == Setup
 
-To set up the project, run:
+To install _with_ security, run:
 
 [source,bash]
 ----
-bin/setup
+# 💡 Skip this line if you already have the public certificate installed.
+gem cert --add <(curl --compressed --location https://alchemists.io/gems.pem)
+gem install sod --trust-policy HighSecurity
+----
+
+To install _without_ security, run:
+
+[source,bash]
+----
+gem install sod
+----
+
+You can also add the gem directly to your project:
+
+[source,bash]
+----
+bundle add sod
+----
+
+Once the gem is installed, you only need to require it:
+
+[source,ruby]
+----
+require "sod"
 ----
 
 == Usage
+
+Creating and calling a CLI is as simple as:
+
+[source,ruby]
+----
+Sod.new.call
+# nil
+----
+
+Granted, the above isn't terribly exciting -- in terms of initial behavior -- but illustrates how default behavior provides a _blank slate_ from which to mold custom behavior as you like. To provide minimum functionality, you'll want to give your CLI a name, banner, and throw in the prefabricated help action:
+
+[source,ruby]
+----
+cli = Sod.new :demo, banner: "Demo 0.0.0: A demonstration." do
+  on Sod::Prefabs::Actions::Help, self
+end
+
+cli.call
+
+# Demo 0.0.0: A demonstration.
+#
+# USAGE
+#   demo [OPTIONS]
+#
+# OPTIONS
+#   -h, --help [COMMAND]     Show this message.
+----
+
+Notice, with only a few extra lines of code, you can build upon the initial _blank slate_ provided for you and start to see your custom CLI take form. You can even take this a step further and outline the structure of your CLI with _inline commands_:
+
+[source,ruby]
+----
+cli = Sod.new :demo, banner: "Demo 0.0.0: A demonstration." do
+  on Sod::Prefabs::Actions::Help, self
+
+  on "generate", "Generate project templates."
+  on "db", "Manage database."
+end
+
+cli.call
+
+# Demo 0.0.0: A demonstration.
+#
+# USAGE
+#   demo [OPTIONS]
+#   demo COMMAND [OPTIONS]
+#
+# OPTIONS
+#   -h, --help [COMMAND]     Show this message.
+#
+# COMMANDS
+#   generate                 Generate project templates.
+#   db                       Manage database.
+----
+
+We'll dive into the defaults, prefabrications, and custom commands/actions soon but knowing a _help_ action is provided for you is a good first step in learning how to build your own custom CLI.
+
+=== Name
+
+A good CLI needs a name and, by default, this is the name of file, script, or IRB session you are currently creating your CLI instance in. For example, when using this project's `bin/console` script, my CLI name is:
+
+[source,ruby]
+----
+Sod.new.name  # "console"
+----
+
+The default name is automatically acquired via the `$PROGRAM_NAME` global variable. Any file extension is immediately trimmed which means creating your CLI instance within a `demo.rb` file will have a name of `"demo"`. Should this not be desired, you can customize further by providing your own name:
+
+[source,ruby]
+----
+# With a symbol.
+Sod.new(:demo).name   # "demo"
+
+# With a string.
+Sod.new("demo").name  # "demo"
+----
+
+When using the prefabricated help action, the name of your CLI will also show up in the usage documentation:
+
+[source,ruby]
+----
+Sod.new(:demo) { on Sod::Prefabs::Actions::Help, self }
+   .call
+
+# USAGE
+#   demo [OPTIONS]
+#
+# OPTIONS
+#   -h, --help [COMMAND]     Show this message.
+----
+
+=== Banner
+
+The banner is optional but strongly encouraged because it allows you to give your CLI a label and short description. Example:
+
+[source,ruby]
+----
+cli = Sod.new :demo, banner: "Demo 0.0.0: A demonstration." do
+  on Sod::Prefabs::Actions::Help, self
+end
+
+cli.call
+
+# Demo 0.0.0: A demonstration.
+#
+# USAGE
+#   demo [OPTIONS]
+#
+# OPTIONS
+#   -h, --help [COMMAND]     Show this message.
+----
+
+As you can see, when a banner is present, you are able to describe your CLI while providing relevant information such as current version with minimal effort.
+
+=== DSL
+
+You've already seen some of the DSL syntax, via the earlier examples, but now we can zoom in on the building blocks: commands and actions. Only a single method is required to add them: `on`. For example, here's what nesting looks like:
+
+[source,ruby]
+----
+Sod.new :demo, banner: "Demo 0.0.0: A demonstration." do
+  on "db", "Manage database." do
+    on Start
+    on Stop
+
+    on "structure", "Manage database structure." do
+      on Dump
+    end
+  end
+
+  on Sod::Prefabs::Actions::Version, "Demo 0.0.0"
+  on Sod::Prefabs::Actions::Help, self
+end
+----
+
+Despite the `Start`, `Stop`, and `Dump` actions not being implemented yet -- because you'll get a `NameError` if you try -- this does mean you'd have the following functionality available to you from the command line:
+
+[source,bash]
+----
+demo db --start
+demo db --stop
+demo db structure --dump
+demo --version
+demo --help
+----
+
+The `on` method is the primary method of the DSL. Short and sweet. You'll also see `on` used when implementing custom commands and actions too. The `on` method can take any number of positional and/or keyword arguments. Here's an example where you might want to customize your database action by injecting a new dependencies:
+
+[source,ruby]
+----
+Sod.new :demo, banner: "Demo 0.0.0: A demonstration." do
+  on DB, "MyDatabase", host: localhost, port: 5432
+end
+----
+
+The first _positional_ argument (i.e. `DB`) is _always_ your action (don't worry, this'll be explained shortly), the second _positional_ argument is the first positional argument to the `DB.new` method followed by the `host` and `port` _keyword_ arguments. In other words, here's what's happening:
+
+[source,ruby]
+----
+# Pattern
+on DB, *, **
+
+# DSL
+on DB, "MyDatabase", host: localhost, port: 5432
+
+# Actual
+DB.new "MyDatabase", host: localhost, port: 5432
+----
+
+This also means you get the following benefits:
+
+* Lazy initialization of your commands/actions.
+* Any positional and/or keyword arguments will be forwarded to your command/action. Blocks are excluded since they are used by the `on` method for nesting purposes.
+
+To further understand the DSL, commands, and actions you'll need to start with actions since they are the building blocks.
+
+==== Actions
+
+Actions are the lowest building blocks of the DSL which allow you to quickly implement, test, reuse, and compose more complex architectures. They provide a nice wrapper around native {option_parser_link} functionality so if you are familiar with how `OptionParser#on` works, then you'll feel at home with actions.
+
+There are two kinds of actions: custom and prefabricated. We'll start with custom actions and explore prefabricated actions later. Custom actions allow you to define your own functionality by inheriting from `Sod::Action` and leveraging the DSL that comes with it. Here's a high level breakdown of the macros you can use:
+
+* `description`: Optional (but strongly encouraged). Allows you to describe your action and appears within help documentation. If the description is not defined, then your action will be runnable while hidden from help documentation (this is similar to how {rake_link} task descriptions work).
+* `ancillary`: Optional. Allows you to provide supplemental text in addition to your description that might be helpful to know about when displaying help documentation. This can accept single or multiple arguments. Order matters since each argument will appear on a separate line in the order listed.
+* `on`: Required. Allows you to define the behavior of your action through keyword arguments. Otherwise, if not defined, the action will be ignored. This macro mimics {option_parser_link} `#on` behavior via the following positional and keyword arguments:
+** `aliases`: Required. This is a positional argument and defines the short and long form aliases of your action. Your aliases can be a single string (i.e. `on "--version"`) or an array of short and long form aliases. For example, using `on %w[-v --version]` would allow you to use `-v` or `--version` from the command line to call your action. You can also use boolean aliases such as `--build` or `--[no-]build` which the option parser will supply to your `#call` method as a boolean value.
+** `argument`: Optional. Serves as documentation, must be a string value, and allows the {option_parser_link} to determine if the argument is required or optional. As per the {option_parser_link} documentation, you could use the following values for example:
+*** `TEXT`: Required text.
+*** `[TEXT]`: Optional text.
+*** `a,b,c`: Required list.
+*** `[a,b,c]`: Optional list.
+** `type`: Optional. The type is inferred from your argument but, if you need to be explicit or want to use a custom type not supported by the option parser by default, you can specify the type by providing a primitive. Example: `String`, `Array`, `Hash`, `Date`, etc. You can also use custom types, as provided by this gem, or your own custom type. See {option_parser_link} documentation for details.
+** `allow`: Optional. Allows you to define what values are allowed as defined via the `argument` or `type` keywords. This can be a string, array, hash, etc. as long as it's compatible with what is defined via the `argument` and/or `type` keyword. This information will also show up in the help documentation as well.
+** `default`: Optional. Allows you to supply a default value and is a handy for simple values which don't require lazy evaluation via the corresponding default macro. ⚠️ This is ignored if the corresponding macro is used so ensure you use one or the other but not both.
+** `description`: Optional. Allows you to define a description. Handy for short descriptions that can fit on a single line. Otherwise, for longer descriptions, use the macro. ⚠️ This is ignored if the corresponding macro is used so ensure you use one or the other but not both.
+** `ancillary`: Optional. Allows you to define ancillary text to supplement your description. It can accept a string or an array. Handy for short, supplementary, text that can fit on a single line. Otherwise, for more verbose details, use the macro. ⚠️ This is ignored if the corresponding macro is used so ensure you use one or the other but not both.
+* `default`: Optional. Uses a block, which is lazy evaluated, so you can define a default value. This is most helpful when used in combination with an _optional_ `argument` and/or `type` which can fallback to a safe default. This information shows up in the help text too. If your default value is a boolean then it will be color coded green for `true` and red for `false`.
+
+At a minimum, you want to define the `description` and `on` macros while implementing the `#call` message. Here's an example of implementing an action that echoes input as output:
+
+[source,ruby]
+----
+class Echo < Sod::Action
+  description "Echo input as output."
+
+  on %w[-e --echo], argument: "TEXT"
+
+  def call(text) = puts text
+end
+
+cli = Sod.new :demo, banner: "Demo 0.0.0: A demonstration" do
+  on Echo
+  on Sod::Prefabs::Actions::Help, self
+end
+----
+
+If we run the above implementation with different inputs, we'll get multiple outputs:
+
+[source,ruby]
+----
+cli.call
+
+# Demo 0.0.0: A demonstration
+#
+# USAGE
+#   demo [OPTIONS]
+#
+# OPTIONS
+#   -e, --echo TEXT          Echo input as output.
+#   -h, --help [COMMAND]     Show this message.
+#
+# cli.call %w[--echo hello]
+
+cli.call %w[--echo hello]
+
+# hello
+
+cli.call %s[--e hello]
+
+# hello
+
+cli.call ["--echo"]
+
+# 🛑 Missing argument for: --echo.
+----
+
+As you can see, the description shows up in the help text while the `-e` and `--echo` aliases can be used interchangeably. We only get the missing argument error when the argument (i.e. `"TEXT"`) isn't supplied. Finally, when the action is called, we see that the `"hello"` text is outputted to the console for use. Here's an updated version of the above implementation which leverages all features:
+
+[source,ruby]
+----
+class Echo < Sod::Action
+  description "Echo input as output."
+
+  ancillary "Supplementary text.", "Additional text."
+
+  on %w[-e --echo], argument: "[TEXT]", type: String, allow: %w[hello goodbye]
+
+  default { "hello" }
+
+  def call(text = nil) = puts(text || default)
+end
+
+cli = Sod.new :demo, banner: "Demo 0.0.0: A demonstration" do
+  on Echo
+  on Sod::Prefabs::Actions::Help, self
+end
+----
+
+This time, when we run the above implementation, we have additional details:
+
+[source,ruby]
+----
+cli.call
+
+# Demo 0.0.0: A demonstration
+#
+# USAGE
+#   demo [OPTIONS]
+#
+# OPTIONS
+#   -e, --echo [TEXT]        Echo input as output.
+#                            Supplementary text.
+#                            Additional text.
+#                            Use: hello or goodbye.
+#                            Default: hello.
+#   -h, --help [COMMAND]     Show this message.
+
+cli.call ["--echo"]
+
+# hello
+
+cli.call %w[--echo goodbye]
+
+# goodbye
+
+cli.call %w[--echo hi]
+
+# 🛑 Invalid argument: --echo hi
+----
+
+Notice how the help text is more verbose. Not only do you see the description for the `--echo` action printed but you also see the two ancillary lines, documentation on what is allowed (i.e. you can only use "hello" or "goodbye"), and what the default will be (i.e. "hello") when `--echo` doesn't get an argument since it's optional. This is why you can see `--echo` can be called with nothing, an allowed value, or an value that isn't allowed which causes an _invalid argument_ error to show up.
+
+Lastly, your action's `#call` method _must_ be implemented. Otherwise, you'll get an exception as show here:
+
+[source,ruby]
+----
+class Echo < Sod::Action
+  description "Echo input as output."
+  on %w[-e --echo]
+end
+
+cli = Sod.new :demo, banner: "Demo 0.0.0: A demonstration" do
+  on Echo
+  on Sod::Prefabs::Actions::Help, self
+end
+
+cli.call ["--echo"]
+
+# `Echo#call [[:rest, :*]]` must be implemented. (NotImplementedError)
+----
+
+At a minimum, as shown from the error above, your `#call` method needs to allow the forwarding of positional arguments which means you can use `def call(*)` if you want to ignore arguments or define which arguments you care about and ignore the rest. Up to you. Also, _all_ of the information defined within your action is available to you within the instance. Here's an example action which inspects itself:
+
+[source,ruby]
+----
+class Echo < Sod::Action
+  description "Echo input as output."
+
+  ancillary "Supplementary."
+
+  on "--inspect", argument: "[TEXT]", type: String, allow: %w[one two], default: "A default."
+
+  def call(*)
+    puts handle:, aliases:, argument:, type:, allow:, default:, description:, ancillary:
+  end
+end
+
+cli = Sod.new :demo, banner: "Demo 0.0.0: A demonstration" do
+  on Echo
+  on Sod::Prefabs::Actions::Help, self
+end
+
+cli.call ["--inspect"]
+
+# {
+#   :handle => "--inspect [TEXT]",
+#   :aliases => ["--inspect"],
+#   :argument => "[TEXT]",
+#   :type => String,
+#   :allow => ["one", "two"],
+#   :default => "A default.",
+#   :description => "Echo input as output.",
+#   :ancillary => ["Supplementary."]
+# }
+----
+
+Although, not shown in the above, the `#to_a` and `#to_h` methods are available as well.
+
+==== Commands
+
+Commands are a step up from actions in that they allow you to organize and group your actions while giving you the ability to process the data parsed by your actions. If it helps, a command mimics {option_parser_link} behavior when you initialize and define multiple, actionable, blocks. Here's an example which maps the terminology of this gem with that of {option_parser_link}:
+
+[source,ruby]
+----
+options = {}
+
+# Command
+OptionParser.new do |parser|
+  # Actions
+  parser.on("--one", "One.") { |value| options[:one] = value }
+  parser.on("--two", "Two.") { |value| options[:two] = value }
+  parser.on("--three", "Three.") { |value| options[:three] = value }
+end
+----
+
+The equivalent of the above, as provided by this gem, is:
+
+[source,ruby]
+----
+require "dry/container"
+require "infusible"
+require "refinements/structs"
+require "sod"
+
+module Container
+  extend Dry::Container::Mixin
+
+  register(:input, memoize: true) { Hash.new }
+end
+
+Import = Infusible.with Container
+
+class One < Sod::Action
+  include Import[:input]
+
+  on "--[no-]one", description: "One."
+
+  def call(value) = input[:one] = value
+end
+
+class Two < Sod::Action
+  include Import[:input]
+
+  on "--[no-]two", description: "Two."
+
+  def call(value) = input[:two] = value
+end
+
+class Demo < Sod::Command
+  include Import[:input]
+
+  handle "demo"
+
+  description "A demonstration command."
+
+  on One
+  on Two
+
+  def call = puts input
+end
+
+cli = Sod.new :demo, banner: "Demo 0.0.0: A demonstration" do
+  on Demo
+  on Sod::Prefabs::Actions::Help, self
+end
+
+cli.call ["demo", "--one", "--no-two"]
+
+# {:one => true, :two => false}
+----
+
+You might be thinking: "Hey, that's more lines of code!" True but -- more importantly -- you get the benefit of composible and reusable architectures -- because each command/action is encapsulated -- which you don't get with {option_parser_link}.
+
+By the way, the above example uses the {dry_container_link} gem for defining dependencies and the {infusible_link} gem for injecting those dependencies. You'll also notice that the `input` hash is memoized within the container to allow for mutation. The fact that you have to mutate input is a bummer and you should strive to avoid mutation whenever you can. In this case, mutation is necessary because the underlining architecture of the {option_parser_link} doesn't provide any other way to share state amongst your commands and actions. So this is one example of how you can do that.
+
+You'll also notice, as mentioned with actions earlier, that commands share, roughly, the same DSL as actions with a few differences in terms of macros:
+
+* `handle`: Required. The name of your command or the _namespace_ for which you group multiple actions. Otherwise, if not defined, then your command won't be runnable.
+* `description`: Optional (but strongly recommended). Defines what your command is about and shows up in the help documentation. Otherwise, if not provided, your command's description will be blank.
+* `ancillary`: Optional. Allows you to provide supplemental text for your description that might be helpful to know about when displaying help documentation. This can accept single or multiple arguments. Order matters since each argument will appear on a separate line in the order listed.
+* `on`: Required. The syntax for this is identical to the CLI DSL where you define your action (constant) as the first positional argument followed by any number of positional and/or keyword arguments that you want to feed into your action when the `.new` method is called.
+
+If we reuse the above example and print the help documentation, you'll see the following output:
+
+[source,ruby]
+----
+cli.call
+
+# Demo 0.0.0: A demonstration
+#
+# USAGE
+#   demo [OPTIONS]
+#   demo COMMAND [OPTIONS]
+#
+# OPTIONS
+#   -h, --help [COMMAND]     Show this message.
+#
+# COMMANDS
+#   demo                     A demonstration command.
+----
+
+...and if we display help on the `demo` command itself, we'll see all of it's capabilities:
+
+[source,ruby]
+----
+cli.call ["demo"]
+
+# A demonstration command.
+#
+# USAGE
+#   demo [OPTIONS]
+#
+# OPTIONS
+#   --[no-]one
+#   --[no-]two
+----
+
+Commands come in two forms: inline and reusable. You've already seen how reusable commands work but the next sections will go into more detail.
+
+===== Inline
+
+Inline commands provide a lightweight way to namespace your actions when you don't need, or want, to implement a _reusable_ command. If we refactor the earlier example to use inline commands, here's what it would look like:
+
+[source,ruby]
+----
+cli = Sod.new :demo, banner: "Demo 0.0.0: A demonstration" do
+  on "demo", "A demonstration command." do
+    on One
+    on Two
+  end
+
+  on Sod::Prefabs::Actions::Help, self
+end
+----
+
+Inline commands can have ancillary text by passing in additional arguments _after_ the description. Example:
+
+[source,ruby]
+----
+cli = Sod.new :demo, banner: "Demo 0.0.0: A demonstration" do
+  on "demo", "A demonstration command.", "Some text.", "Some more text."
+end
+----
+
+While the above is convenient, it can get out of control quickly. If this happens, please consider taking your _inline_ command and turning it into a _reusable_ command so your implementation remains organized and readable.
+
+There is no limit on how deep you can go with nesting but if you are using anything beyond one or two levels of nesting then you should reconsider your design as your CLI is getting too complicated.
+
+===== Reusable
+
+A _reusable_ command is what you saw earlier where you can subclass from `Sod::Command` to implement your custom command. Here's the code again:
+
+[source,ruby]
+----
+class Demo < Sod::Command
+  handle "demo"
+
+  description "A demonstration command."
+
+  ancillary "Some text.", "Some more text."
+
+  on One
+  on Two
+
+  def call = puts "Your implementation goes here."
+end
+----
+
+One major difference between _reusable_ and _inline_ commands is that _reusable_ commands allow you implement a `#call` method. This method is optional, so if you don't need it, you don't have to implement it. However, if you do, this means you can process the input from your actions. This method is called _after_ the option parser has parsed all command line input for your actions which gives you a handy way to process all collected input via a single command. 💡 This is how the {rubysmith_link}, {gemsmith_link}, and {hanamismith_link} gems all build new Ruby projects for you based on the actions passed to them via the CLI.
+
+==== Initialization
+
+In all the action and command examples, thus far, we've not used an initializer. You can always customize how your command or action is initialized by defining one and forwarding all keyword arguments to `super`. Here's an example for both an action and a command:
+
+[source,ruby]
+----
+class MyAction < Sod::Action
+  def initialize(processor: Processor.new, **)
+    super(**)
+    @processor = processor
+  end
+end
+
+class MyCommand < Sod::Command
+  def initialize(handler: Handler.new, **)
+    super(**)
+    @handler = handler
+  end
+end
+----
+
+The reason you need to forward keyword arguments to `super` is so that injected dependencies from the super class are always available to you. Especially, contexts, which are explained next.
+
+==== Contexts
+
+Contexts are a mechanism for passing common data between your commands and actions with override capability if desired. They are a hybrid between a `Hash` and a `Struct`. They can be constructed two ways depending on your preference:
+
+[source,ruby]
+----
+# Traditional
+context = Sod::Context.new defaults_path: "path/to/defaults.yml", version_label: "Demo 0.0.0"
+
+# Short (like Struct or Data)
+context = Sod::Context[defaults_path: "path/to/defaults.yml", version_label: "Demo 0.0.0"]
+----
+
+Once you have an instance, you can use it as follows:
+
+[source,ruby]
+----
+# Direct
+context.defaults_path               # "path/to/defaults.yml"
+
+# With override.
+context["my/path", :defaults_path]  # "my/path"
+----
+
+The override is handy for situations where you have a default value that you would prefer to use (i.e. first argument) but want to fallback to the `:defaults_path` if the override is `nil`. When you put all of this together, this means you can build a single context and use it within your commands and actions by injecting it:
+
+[source,ruby]
+----
+context = Sod::Context[defaults_path: "path/to/defaults.yml" version_label: "Demo 0.0.0"]
+
+Sod.new :demo, banner: "A demonstration." do
+  on(Sod::Prefabs::Commands::Config, context:)
+  on(Sod::Prefabs::Actions::Version, context:)
+  on Sod::Prefabs::Actions::Help, self
+end
+----
+
+💡 When passing a context to a command, it'll automatically be passed to all actions defined within that command. Each action can then choose to use the context or not.
+
+==== Types
+
+Types are a way to extend default {option_parser_link} functionality. Two types, not provided by {option_parser_link}, that are worth being aware of are:
+
+**Pathname**
+
+Provided by this gem and must be manually required since it's disabled by default. Example:
+
+[source,ruby]
+----
+require "sod"
+require "sod/types/pathname"
+
+class Demo < Sod::Action
+  on "--path", argument: "PATH", type: Pathname
+end
+----
+
+With the above, you'll always get a link:https://rubyapi.org/o/s?q=Pathname[Pathname] instance as input to your action.
+
+**Version**
+
+Provided via the {versionaire_link} gem which gives you a `Version` type when dealing with link:https://semver.org[semantic versions]. Here's how to leverage it:
+
+[source,ruby]
+----
+require "versionaire"
+require "versionaire/extensions/option_parser"
+
+class Demo < Sod::Action
+  on "--version", argument: "VERSION", type: Versionaire::Version
+end
+----
+
+==== Prefabrications
+
+Several pre-built commands and actions are provided for you as foundational tooling to get you up and running quickly. You can use and customize them as desired.
+
+===== Configure
+
+The configure command -- and associated actions -- allows you to interact with CLI configurations such as those managed by the {xdg_link}, {runcom_link}, and/or {etcher_link} gems which adhere to the XDG Directory Specification. Example:
+
+[source,ruby]
+----
+require "runcom"
+
+context = Sod::Context[
+  defaults_path: "defaults.yml",
+  xdg_config: Runcom::Config.new("demo/configuration.yml")
+]
+
+cli = Sod.new :rubysmith, banner: "Demo 0.0.0: A demonstration." do
+  on(Sod::Prefabs::Commands::Config, context:)
+  on Sod::Prefabs::Actions::Help, self
+end
+
+cli.call ["config"]
+
+# Manage configuration.
+#
+# USAGE
+#   config [OPTIONS]
+#
+# OPTIONS
+#   -c, --create     Create default configuration.
+#                    Prompts for local or global path.
+#   -e, --edit       Edit project configuration.
+#   -v, --view       View project configuration.
+#   -d, --delete     Delete project configuration.
+#                    Prompts for confirmation.
+----
+
+This action is most useful when building customizable CLIs where you want users of your CLI to have the flexibility of customizing their preferences.
+
+===== Help
+
+By now you should be familiar with the help action which allows you to print CLI documentation for users of your CLI. This action consumes the entire graph (i.e. `self`) of information in order to render documentation. You'll want to add this by default or customize with your own help action should you not like the default functionality. Anything is possible. Here's how to use:
+
+[source,ruby]
+----
+cli = Sod.new :demo, banner: "Demo 0.0.0: A demonstration." do
+  on Sod::Prefabs::Actions::Help, self
+end
+
+cli.call
+cli.call ["-h"]
+cli.call ["--help"]
+cli.call ["--help", "some_command"]
+----
+
+💡 Passing `-h` or `--help` is optional since the CLI will default to printing help if only given a command.
+
+===== Version
+
+The version action allows users to check which version of your CLI they are using and only requires supplying version information when creating the action:
+
+[source,ruby]
+----
+cli = Sod.new :demo, banner: "Demo 0.0.0: A demonstration." do
+  on Sod::Prefabs::Actions::Version.new("Demo 0.0.0")
+end
+
+cli.call ["-v"]         # Demo 0.0.0
+cli.call ["--version"]  # Demo 0.0.0
+----
+
+💡 This pairs well with the {spek_link} gem which pulls this information straight from your `gemspec`.
+
+=== Examples
+
+Hopefully the above is plenty of information to get you started but here are a few more examples in case it helps:
+
+==== Inline Script
+
+The following demonstrates an link:https://alchemists.io/articles/ruby_bundler_inline[inline script] using commands and actions.
+
+[source,ruby]
+----
+#! /usr/bin/env ruby
+# frozen_string_literal: true
+
+# Save as `demo`, then `chmod 755 demo`, and run as `./demo`.
+
+require "bundler/inline"
+
+gemfile true do
+  source "https://rubygems.org"
+
+  gem "amazing_print"
+  gem "debug"
+  gem "sod"
+end
+
+class Start < Sod::Action
+  include Sod::Import[:logger]
+
+  description "Start database."
+
+  on "--start"
+
+  def call(*) = logger.info { "Starting database..." }
+end
+
+class Stop < Sod::Action
+  include Sod::Import[:logger]
+
+  description "Stop database."
+
+  on "--stop"
+
+  def call(*) = logger.info { "Stopping database..." }
+end
+
+class Echo < Sod::Action
+  include Sod::Import[:kernel]
+
+  description "Echo input as output."
+
+  on %w[-e --echo], argument: "TEXT"
+
+  def call(text) = kernel.puts text
+end
+
+cli = Sod.new :demo, banner: "Demo 0.0.0: A demonstration." do
+  on "db", "Manage database." do
+    on Start
+    on Stop
+  end
+
+  on Sod::Prefabs::Actions::Version, "Demo 0.0.0"
+  on Sod::Prefabs::Actions::Help, self
+end
+----
+
+Once you've saved the above to your local disk, you can experiment with it by passing different command line arguments to it:
+
+[source,bash]
+----
+./demo
+
+# Demo 0.0.0: A demonstration.
+#
+# USAGE
+#   demo [OPTIONS]
+#   demo COMMAND [OPTIONS]
+#
+# OPTIONS
+#   -v, --version            Show version.
+#   -h, --help [COMMAND]     Show this message.
+#
+# COMMANDS
+#   db                       Manage database.
+
+./demo db
+
+# Manage database.
+#
+# USAGE
+#   db [OPTIONS]
+#
+# OPTIONS
+#   --start     Start database.
+#   --stop      Stop database.
+
+./demo db --start
+# 🟢 Starting database...
+
+./demo db --stop
+# 🟢 Stopping database...
+
+./demo --version
+# Demo 0.0.0
+----
+
+==== Gems
+
+The following gems are built atop Sod and you can study the `CLI` namespace each or use the {gemsmith_link} gem to generate a CLI template project with all of this baked in for you. Here's the list:
+
+* {gemsmith_link}
+* {git-lint_link}
+* {hanamismith_link}
+* {milestoner_link}
+* {pennyworth_link}
+* {pragmater_link}
+* {rubysmith_link}
+* {sublime_text_kit_link}
+* {tocer_link}
 
 == Development
 

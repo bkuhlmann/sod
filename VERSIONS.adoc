@@ -2,4 +2,30 @@
 
 == 0.0.0 (2023-06-15)
 
-* Added initial implementation.
+* Added action - Brooke Kuhlmann
+* Added action model - Brooke Kuhlmann
+* Added action presenter - Brooke Kuhlmann
+* Added command - Brooke Kuhlmann
+* Added command model - Brooke Kuhlmann
+* Added constructor - Brooke Kuhlmann
+* Added container - Brooke Kuhlmann
+* Added context - Brooke Kuhlmann
+* Added dependencies - Brooke Kuhlmann
+* Added documentation - Brooke Kuhlmann
+* Added error - Brooke Kuhlmann
+* Added graph loader - Brooke Kuhlmann
+* Added graph node - Brooke Kuhlmann
+* Added graph runner - Brooke Kuhlmann
+* Added import - Brooke Kuhlmann
+* Added node presenter - Brooke Kuhlmann
+* Added option parser pathname type - Brooke Kuhlmann
+* Added option parser refinements - Brooke Kuhlmann
+* Added prefabrication for configuration command - Brooke Kuhlmann
+* Added prefabrication for configuration create action - Brooke Kuhlmann
+* Added prefabrication for configuration delete action - Brooke Kuhlmann
+* Added prefabrication for configuration edit action - Brooke Kuhlmann
+* Added prefabrication for configuration view action - Brooke Kuhlmann
+* Added prefabrication for help action - Brooke Kuhlmann
+* Added prefabrication for version action - Brooke Kuhlmann
+* Added project skeleton - Brooke Kuhlmann
+* Added shell - Brooke Kuhlmann
