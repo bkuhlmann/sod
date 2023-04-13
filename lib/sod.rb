@@ -9,4 +9,5 @@ end
 
 # Main namespace.
 module Sod
+  def self.new(...) = Shell.new(...)
 end
