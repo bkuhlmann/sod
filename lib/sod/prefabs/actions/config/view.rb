@@ -1,0 +1,47 @@
+# frozen_string_literal: true
+
+require "refinements/pathnames"
+
+module Sod
+  module Prefabs
+    module Actions
+      module Config
+        # Displays project configuration.
+        class View < Action
+          include Import[:kernel, :logger]
+
+          using Refinements::Pathnames
+
+          description "View project configuration."
+
+          on %w[-v --view]
+
+          # :reek:ControlParameter
+          def initialize(path = nil, **)
+            super(**)
+            @path = Pathname(path || context.xdg_config.active)
+          end
+
+          def call(*)
+            return unless check
+
+            logger.info { "Viewing (#{path.to_s.inspect}):" }
+            kernel.puts path.read
+          end
+
+          private
+
+          attr_reader :path
+
+          def check
+            return true if path.exist?
+
+            logger.error { "Configuration doesn't exist: #{path.to_s.inspect}." }
+            kernel.abort
+            false
+          end
+        end
+      end
+    end
+  end
+end
