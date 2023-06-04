@@ -3,5 +3,8 @@ exclude_paths:
   - vendor
 
 detectors:
+  BooleanParameter:
+    exclude:
+      - "Sod::Context#respond_to_missing?"
   LongParameterList:
     enabled: false
