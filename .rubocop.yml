@@ -4,3 +4,6 @@ inherit_gem:
 Metrics/ParameterLists:
   Exclude:
     - "lib/sod/models/action.rb"
+RSpec/FilePath:
+  Exclude:
+    - "spec/lib/sod/types/pathname_spec.rb"
