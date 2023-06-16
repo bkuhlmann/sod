@@ -5,39 +5,36 @@
 #//# --------------------------------------------------------------------------------------
 title "Sod Architecture"
 
-participant Process
-participant Register
-participant Parse
-participant Act
+participant Shell
+participant Runner
+participant Loader
 
-Load->Load: Load.
+Shell->Shell: Build.
 
-note over Load
-  "Sequentially reduces default configurations into a single merged configuration."
+note over Shell
+  "Builds the graph by walking over each node defined in the DSL."
 end note
 
-Load->Override: Transfer.
+Shell->Runner: Load.
 
-Override->Transform: Override (optional).
-
-note over Override
-  "Merges specific overrides."
+note over Runner
+  "Delegates to loader to load option parsers per command/action."
 end note
 
-Transform->Transform: Transform (optional).
+Loader->Loader: Visit.
 
-note over Transform
-  "Sequentially transforms individual values within merged configuration."
+note over Loader
+  "Visits each node in the graph and loads the corresponding option parser per action."
 end note
 
-Transform->Validate: Transfer.
+Loader->Runner: Visit.
 
-Validate->Result: Validate
-
-note over Validate
-  "Ensures merged and transformed configuration is valid."
+note over Runner
+  "Visits each graph node by parsing and executing upon CLI arguments per command/action."
 end note
 
-note over Result
-  "Answers monad with record or errors."
+Runner->Runner: Output.
+
+note over Runner
+  "Prints final result, error, or help text."
 end note

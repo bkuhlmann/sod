@@ -43,11 +43,11 @@ toc::[]
 
 *DSL*
 
-image::https://alchemists.io/images/projects/sod/screenshots/dsl.png[A screenshot of the DSL syntax,width=597,height=512,role=focal_point]
+image::https://alchemists.io/images/projects/sod/screenshots/dsl.png[A screenshot of the DSL syntax,width=539,height=479,role=focal_point]
 
 *Output*
 
-image::https://alchemists.io/images/projects/sod/screenshots/output.png[A screenshot of the generated help documentation,width=473,height=500,role=focal_point]
+image::https://alchemists.io/images/projects/sod/screenshots/output.png[A screenshot of the generated help documentation,width=472,height=498,role=focal_point]
 
 == Requirements
 
@@ -924,6 +924,12 @@ You can also use the IRB console for direct access to all objects:
 ----
 bin/console
 ----
+
+=== Architecture
+
+The architecture of this gem is built entirely around {option_parser_link} by using a graph of nodes (i.e. commands) which can be walked since each node within the graph may or may not have children (i.e. nesting).
+
+image::https://alchemists.io/images/projects/sod/doc/architecture.svg[Architecture Diagram]
 
 == Tests
 
