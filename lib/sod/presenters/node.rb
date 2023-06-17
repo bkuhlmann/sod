@@ -16,7 +16,7 @@ module Sod
       using Refinements::Arrays
       using Refinements::Strings
 
-      delegate Graph::Node.members => :node
+      delegate %i[handle description ancillary operation children] => :node
 
       attr_reader :actions
 
