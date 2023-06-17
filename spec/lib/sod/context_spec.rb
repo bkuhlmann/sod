@@ -31,7 +31,7 @@ RSpec.describe Sod::Context do
 
       expect(&expectation).to raise_error(
         Sod::Error,
-        /Invalid context. Default or fallback \(:bogus\) values are missing./
+        /Invalid context. Override or fallback \(:bogus\) values are missing./
       )
     end
   end

@@ -664,7 +664,7 @@ context.defaults_path               # "path/to/defaults.yml"
 context["my/path", :defaults_path]  # "my/path"
 ----
 
-The override is handy for situations where you have a default value that you would prefer to use (i.e. first argument) but want to fallback to the `:defaults_path` if the override is `nil`. When you put all of this together, this means you can build a single context and use it within your commands and actions by injecting it:
+The override is handy for situations where you have a value (first argument) that you would prefer to use while still being able to fallback to the `:defaults_path` if the override is `nil`. When you put all of this together, this means you can build a single context and use it within your commands and actions by injecting it:
 
 [source,ruby]
 ----

@@ -6,6 +6,9 @@ detectors:
   BooleanParameter:
     exclude:
       - "Sod::Context#respond_to_missing?"
+  ControlParameter:
+    exclude:
+      - "Sod::Context#[]"
   LongParameterList:
     enabled: false
   ModuleInitialize:

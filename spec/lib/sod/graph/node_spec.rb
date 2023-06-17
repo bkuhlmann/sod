@@ -258,7 +258,7 @@ RSpec.describe Sod::Graph::Node do
 
       expect(&expectation).to raise_error(
         Sod::Error,
-        /Invalid context. Default or fallback \(:version_label\) values are missing./
+        /Invalid context. Override or fallback \(:version_label\) values are missing./
       )
     end
 

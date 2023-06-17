@@ -11,11 +11,10 @@ module Sod
       @attributes = attributes
     end
 
-    # :reek:ControlParameter
-    def [] default, fallback
-      default || public_send(fallback)
+    def [] override, fallback
+      override || public_send(fallback)
     rescue NoMethodError
-      raise Error, "Invalid context. Default or fallback (#{fallback.inspect}) values are missing."
+      raise Error, "Invalid context. Override or fallback (#{fallback.inspect}) values are missing."
     end
 
     def to_h = attributes.dup
