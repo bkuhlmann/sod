@@ -8,9 +8,9 @@ module Sod
   class Action
     extend Forwardable
 
-    def self.inherited base
+    def self.inherited subclass
       super
-      base.class_eval { @attributes = {} }
+      subclass.class_eval { @attributes = {} }
     end
 
     def self.description text
