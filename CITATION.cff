@@ -1,10 +1,10 @@
 cff-version: 1.2.0
 message: Please use the following metadata when citing this project in your work.
 title: Sod
-abstract: A Domain Specific Language for creating composable Command Line Interfaces.
-version: 0.0.0
+abstract: A domain specific language for creating composable command line interfaces.
+version: 0.1.0
 license: Hippocratic-2.1
-date-released: 2023-06-15
+date-released: 2023-06-20
 authors:
   - family-names: Kuhlmann
     given-names: Brooke

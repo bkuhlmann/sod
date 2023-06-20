@@ -3,7 +3,6 @@
 :figure-caption!:
 
 :cogger_link: link:https://alchemists.io/projects/cogger[Cogger]
-:dry_container_link: link:https://dry-rb.org/gems/dry-container[Dry Container]
 :etcher_link: link:https://alchemists.io/projects/etcher[Etcher]
 :gemsmith_link: link:https://alchemists.io/projects/gemsmith[Gemsmith]
 :git-lint_link: link:https://alchemists.io/projects/git-lint[Git Lint]
@@ -13,7 +12,6 @@
 :option_parser_link: link:https://rubyapi.org/o/s?q=OptionParser[Option Parser]
 :pennyworth_link: link:https://alchemists.io/projects/pennyworth[Pennyworth]
 :pragmater_link: link:https://alchemists.io/projects/pragmater[Pragmater]
-:rake_link: link:https://github.com/ruby/rake[Rake]
 :rubysmith_link: link:https://alchemists.io/projects/rubysmith[Rubysmith]
 :runcom_link: link:https://alchemists.io/projects/runcom[Runcom]
 :spek_link: link:https://alchemists.io/projects/spek[Spek]
@@ -122,8 +120,8 @@ Notice, with only a few extra lines of code, you can build upon the initial _bla
 cli = Sod.new :demo, banner: "Demo 0.0.0: A demonstration." do
   on Sod::Prefabs::Actions::Help, self
 
-  on "generate", "Generate project templates."
-  on "db", "Manage database."
+  on :generate, "Generate project templates."
+  on :db, "Manage database."
 end
 
 cli.call
@@ -208,11 +206,11 @@ You've already seen some of the DSL syntax, via the earlier examples, but now we
 [source,ruby]
 ----
 Sod.new :demo, banner: "Demo 0.0.0: A demonstration." do
-  on "db", "Manage database." do
+  on :db, "Manage database." do
     on Start
     on Stop
 
-    on "structure", "Manage database structure." do
+    on :structure, "Manage database structure." do
       on Dump
     end
   end
@@ -265,11 +263,11 @@ To further understand the DSL, commands, and actions you'll need to start with a
 
 ==== Actions
 
-Actions are the lowest building blocks of the DSL which allow you to quickly implement, test, reuse, and compose more complex architectures. They provide a nice wrapper around native {option_parser_link} functionality so if you are familiar with how `OptionParser#on` works, then you'll feel at home with actions.
+Actions are the lowest building blocks of the DSL which allow you to quickly implement, test, reuse, and compose more complex architectures. They provide a nice layer atop native `OptionParser#on` functionality.
 
 There are two kinds of actions: custom and prefabricated. We'll start with custom actions and explore prefabricated actions later. Custom actions allow you to define your own functionality by inheriting from `Sod::Action` and leveraging the DSL that comes with it. Here's a high level breakdown of the macros you can use:
 
-* `description`: Optional (but strongly encouraged). Allows you to describe your action and appears within help documentation. If the description is not defined, then your action will be runnable while hidden from help documentation (this is similar to how {rake_link} task descriptions work).
+* `description`: Optional (but strongly encouraged). Allows you to describe your action and appears within help documentation. If the description is not defined, then only your action's handle (i.e. aliases) will be shown.
 * `ancillary`: Optional. Allows you to provide supplemental text in addition to your description that might be helpful to know about when displaying help documentation. This can accept single or multiple arguments. Order matters since each argument will appear on a separate line in the order listed.
 * `on`: Required. Allows you to define the behavior of your action through keyword arguments. Otherwise, if not defined, the action will be ignored. This macro mimics {option_parser_link} `#on` behavior via the following positional and keyword arguments:
 ** `aliases`: Required. This is a positional argument and defines the short and long form aliases of your action. Your aliases can be a single string (i.e. `on "--version"`) or an array of short and long form aliases. For example, using `on %w[-v --version]` would allow you to use `-v` or `--version` from the command line to call your action. You can also use boolean aliases such as `--build` or `--[no-]build` which the option parser will supply to your `#call` method as a boolean value.
@@ -283,7 +281,7 @@ There are two kinds of actions: custom and prefabricated. We'll start with custo
 ** `default`: Optional. Allows you to supply a default value and is a handy for simple values which don't require lazy evaluation via the corresponding default macro. ⚠️ This is ignored if the corresponding macro is used so ensure you use one or the other but not both.
 ** `description`: Optional. Allows you to define a description. Handy for short descriptions that can fit on a single line. Otherwise, for longer descriptions, use the macro. ⚠️ This is ignored if the corresponding macro is used so ensure you use one or the other but not both.
 ** `ancillary`: Optional. Allows you to define ancillary text to supplement your description. It can accept a string or an array. Handy for short, supplementary, text that can fit on a single line. Otherwise, for more verbose details, use the macro. ⚠️ This is ignored if the corresponding macro is used so ensure you use one or the other but not both.
-* `default`: Optional. Uses a block, which is lazy evaluated, so you can define a default value. This is most helpful when used in combination with an _optional_ `argument` and/or `type` which can fallback to a safe default. This information shows up in the help text too. If your default value is a boolean then it will be color coded green for `true` and red for `false`.
+* `default`: Optional. Uses a block, which is lazy evaluated, so you can define a default value. This is most helpful when used in combination with an _optional_ `argument` and/or `type` which can fallback to a safe default. This information shows up in the help text where the value will be rendered green text. In the case of booleans, they will be rendered as green for `true` and red for `false`.
 
 At a minimum, you want to define the `description` and `on` macros while implementing the `#call` message. Here's an example of implementing an action that echoes input as output:
 
@@ -451,53 +449,57 @@ Commands are a step up from actions in that they allow you to organize and group
 
 [source,ruby]
 ----
-options = {}
+#! /usr/bin/env ruby
+# frozen_string_literal: true
+
+# Save as `snippet`, then `chmod 755 snippet`, and run as `./snippet`.
+
+require "optparse"
+
+input = {}
 
 # Command
-OptionParser.new do |parser|
+parser = OptionParser.new do |instance|
   # Actions
-  parser.on("--one", "One.") { |value| options[:one] = value }
-  parser.on("--two", "Two.") { |value| options[:two] = value }
-  parser.on("--three", "Three.") { |value| options[:three] = value }
+  instance.on("--[no-]one", "One.") { |value| input[:one] = value }
+  instance.on("--[no-]two", "Two.") { |value| input[:two] = value }
 end
+
+parser.parse ["--one", "--no-two"]
+puts input
+
+# {:one=>true, :two=>false}
 ----
 
 The equivalent of the above, as provided by this gem, is:
 
 [source,ruby]
 ----
-require "dry/container"
-require "infusible"
-require "refinements/structs"
-require "sod"
+#! /usr/bin/env ruby
+# frozen_string_literal: true
 
-module Container
-  extend Dry::Container::Mixin
+# Save as `snippet`, then `chmod 755 snippet`, and run as `./snippet`.
 
-  register(:input, memoize: true) { Hash.new }
+require "bundler/inline"
+
+gemfile true do
+  source "https://rubygems.org"
+  gem "sod", path: "~/Engineering/OSS/sod"
 end
 
-Import = Infusible.with Container
-
 class One < Sod::Action
-  include Import[:input]
-
   on "--[no-]one", description: "One."
 
-  def call(value) = input[:one] = value
+  def call(value) = context.input[:one] = value
 end
 
 class Two < Sod::Action
-  include Import[:input]
-
   on "--[no-]two", description: "Two."
 
-  def call(value) = input[:two] = value
+  def call(value) = context.input[:two] = value
 end
 
 class Demo < Sod::Command
-  include Import[:input]
-
   handle "demo"
 
   description "A demonstration command."
@@ -505,11 +507,13 @@ class Demo < Sod::Command
   on One
   on Two
 
-  def call = puts input
+  def call = puts context.input
 end
 
-cli = Sod.new :demo, banner: "Demo 0.0.0: A demonstration" do
-  on Demo
+context = Sod::Context[input: {}]
+
+cli = Sod.new banner: "Demo 0.0.0: A demonstration" do
+  on(Demo, context:)
   on Sod::Prefabs::Actions::Help, self
 end
 
@@ -518,15 +522,13 @@ cli.call ["demo", "--one", "--no-two"]
 # {:one => true, :two => false}
 ----
 
-You might be thinking: "Hey, that's more lines of code!" True but -- more importantly -- you get the benefit of composible and reusable architectures -- because each command/action is encapsulated -- which you don't get with {option_parser_link}.
+You might be thinking: "Hey, that's more lines of code!" True but -- more importantly -- you get the benefit of composible and reusable architectures -- because each command/action is encapsulated -- which you don't get with {option_parser_link}. You'll also notice that the `input` hash is mutated. The fact that you have to mutate input is a bummer and you should strive to avoid mutation whenever you can. In this case, mutation is necessary because the underlining architecture of the {option_parser_link} doesn't provide any other way to share state amongst your commands and actions. So this is one example of how you can do that.
 
-By the way, the above example uses the {dry_container_link} gem for defining dependencies and the {infusible_link} gem for injecting those dependencies. You'll also notice that the `input` hash is memoized within the container to allow for mutation. The fact that you have to mutate input is a bummer and you should strive to avoid mutation whenever you can. In this case, mutation is necessary because the underlining architecture of the {option_parser_link} doesn't provide any other way to share state amongst your commands and actions. So this is one example of how you can do that.
+As mentioned earlier with actions, commands share a similar DSL with a few differences in terms of macros:
 
-You'll also notice, as mentioned with actions earlier, that commands share, roughly, the same DSL as actions with a few differences in terms of macros:
-
-* `handle`: Required. The name of your command or the _namespace_ for which you group multiple actions. Otherwise, if not defined, then your command won't be runnable.
-* `description`: Optional (but strongly recommended). Defines what your command is about and shows up in the help documentation. Otherwise, if not provided, your command's description will be blank.
-* `ancillary`: Optional. Allows you to provide supplemental text for your description that might be helpful to know about when displaying help documentation. This can accept single or multiple arguments. Order matters since each argument will appear on a separate line in the order listed.
+* `handle`: Required. The name of your command or the _namespace_ for which you group multiple actions. Must be a string. Otherwise, if not defined, you'll get a `Sod::Error`.
+* `description`: Optional (but strongly recommended). Defines what your command is about and shows up in the help documentation. Otherwise, if not provided, only your command's handle will be shown.
+* `ancillary`: Optional. Allows you to provide supplemental text for your description. Can accept single or multiple arguments. Order matters since each argument will appear on a separate line in the order listed below your description.
 * `on`: Required. The syntax for this is identical to the CLI DSL where you define your action (constant) as the first positional argument followed by any number of positional and/or keyword arguments that you want to feed into your action when the `.new` method is called.
 
 If we reuse the above example and print the help documentation, you'll see the following output:
@@ -573,7 +575,7 @@ Inline commands provide a lightweight way to namespace your actions when you don
 [source,ruby]
 ----
 cli = Sod.new :demo, banner: "Demo 0.0.0: A demonstration" do
-  on "demo", "A demonstration command." do
+  on :demo, "A demonstration command." do
     on One
     on Two
   end
@@ -587,7 +589,7 @@ Inline commands can have ancillary text by passing in additional arguments _afte
 [source,ruby]
 ----
 cli = Sod.new :demo, banner: "Demo 0.0.0: A demonstration" do
-  on "demo", "A demonstration command.", "Some text.", "Some more text."
+  on :demo, "A demonstration command.", "Some text.", "Some more text."
 end
 ----
 
@@ -602,7 +604,7 @@ A _reusable_ command is what you saw earlier where you can subclass from `Sod::C
 [source,ruby]
 ----
 class Demo < Sod::Command
-  handle "demo"
+  handle :demo
 
   description "A demonstration command."
 
@@ -681,7 +683,7 @@ end
 
 ==== Types
 
-Types are a way to extend default {option_parser_link} functionality. Two types, not provided by {option_parser_link}, that are worth being aware of are:
+Types are a way to extend default {option_parser_link} functionality. Two types -- not provided by {option_parser_link} -- worth being aware of are:
 
 **Pathname**
 
@@ -843,7 +845,7 @@ class Echo < Sod::Action
 end
 
 cli = Sod.new :demo, banner: "Demo 0.0.0: A demonstration." do
-  on "db", "Manage database." do
+  on :db, "Manage database." do
     on Start
     on Stop
   end
