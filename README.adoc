@@ -120,8 +120,8 @@ Notice, with only a few extra lines of code, you can build upon the initial _bla
 cli = Sod.new :demo, banner: "Demo 0.0.0: A demonstration." do
   on Sod::Prefabs::Actions::Help, self
 
-  on :generate, "Generate project templates."
-  on :db, "Manage database."
+  on "generate", "Generate project templates."
+  on "db", "Manage database."
 end
 
 cli.call
@@ -206,11 +206,11 @@ You've already seen some of the DSL syntax, via the earlier examples, but now we
 [source,ruby]
 ----
 Sod.new :demo, banner: "Demo 0.0.0: A demonstration." do
-  on :db, "Manage database." do
+  on "db", "Manage database." do
     on Start
     on Stop
 
-    on :structure, "Manage database structure." do
+    on "structure", "Manage database structure." do
       on Dump
     end
   end
@@ -484,7 +484,7 @@ require "bundler/inline"
 
 gemfile true do
   source "https://rubygems.org"
-  gem "sod", path: "~/Engineering/OSS/sod"
+  gem "sod"
 end
 
 class One < Sod::Action
@@ -574,8 +574,8 @@ Inline commands provide a lightweight way to namespace your actions when you don
 
 [source,ruby]
 ----
-cli = Sod.new :demo, banner: "Demo 0.0.0: A demonstration" do
-  on :demo, "A demonstration command." do
+cli = Sod.new banner: "Demo 0.0.0: A demonstration" do
+  on "demo", "A demonstration command." do
     on One
     on Two
   end
@@ -588,8 +588,8 @@ Inline commands can have ancillary text by passing in additional arguments _afte
 
 [source,ruby]
 ----
-cli = Sod.new :demo, banner: "Demo 0.0.0: A demonstration" do
-  on :demo, "A demonstration command.", "Some text.", "Some more text."
+cli = Sod.new banner: "Demo 0.0.0: A demonstration" do
+  on "demo", "A demonstration command.", "Some text.", "Some more text."
 end
 ----
 
@@ -604,7 +604,7 @@ A _reusable_ command is what you saw earlier where you can subclass from `Sod::C
 [source,ruby]
 ----
 class Demo < Sod::Command
-  handle :demo
+  handle "demo"
 
   description "A demonstration command."
 
@@ -672,7 +672,7 @@ The override is handy for situations where you have a value (first argument) tha
 ----
 context = Sod::Context[defaults_path: "path/to/defaults.yml" version_label: "Demo 0.0.0"]
 
-Sod.new :demo, banner: "A demonstration." do
+Sod.new banner: "A demonstration." do
   on(Sod::Prefabs::Commands::Config, context:)
   on(Sod::Prefabs::Actions::Version, context:)
   on Sod::Prefabs::Actions::Help, self
@@ -845,7 +845,7 @@ class Echo < Sod::Action
 end
 
 cli = Sod.new :demo, banner: "Demo 0.0.0: A demonstration." do
-  on :db, "Manage database." do
+  on "db", "Manage database." do
     on Start
     on Stop
   end
