@@ -32,9 +32,9 @@ module Sod
       # rubocop:enable Metrics/ParameterLists
 
       def to_s
-        [banner, "", *usage, "", *colored_actions, "", *colored_commands].tap(&:compact!)
-                                                                         .join("\n")
-                                                                         .strip
+        [banner, body, "", *usage, "", *colored_actions, "", *colored_commands].tap(&:compact!)
+                                                                               .join("\n")
+                                                                               .strip
       end
 
       private
@@ -42,6 +42,8 @@ module Sod
       attr_reader :node, :indent, :gap, :all
 
       def banner = color[description, :bold]
+
+      def body = ancillary.empty? ? nil : ancillary.join("\n").prepend("\n")
 
       def usage
         actions = "  #{colored_handle} [OPTIONS]" unless all.empty?

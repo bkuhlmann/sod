@@ -76,6 +76,22 @@ RSpec.describe Sod::Presenters::Node do
       )
     end
 
+    it "answers commands with descriptions and ancillaries" do
+      graph = Sod::Graph::Node.new(
+        handle: "test",
+        description: "Test 0.0.0: A test.",
+        ancillary: %w[One. Two. Three.]
+      )
+
+      presenter = described_class.new graph
+
+      expect(presenter.to_s).to have_color(
+        color,
+        ["Test 0.0.0: A test.", :bold],
+        ["\n\nOne.\nTwo.\nThree."]
+      )
+    end
+
     it "answers actions without descriptions" do
       action = Class.new(Sod::Action) { on "--test" }
       graph = Sod::Graph::Node.new(handle: :test, description: "Test 0.0.0: A test.").on(action)
