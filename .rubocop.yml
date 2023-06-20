@@ -7,3 +7,6 @@ Metrics/ParameterLists:
 RSpec/FilePath:
   Exclude:
     - "spec/lib/sod/types/pathname_spec.rb"
+RSpec/ExampleLength:
+  Exclude:
+    - "spec/lib/sod/action_spec.rb"

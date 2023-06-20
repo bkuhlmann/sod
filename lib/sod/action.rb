@@ -42,8 +42,8 @@ module Sod
 
       @record = model[
         **klass.instance_variable_get(:@attributes),
-        description: klass.instance_variable_get(:@description),
-        ancillary: Array(klass.instance_variable_get(:@ancillary)).compact,
+        description: load(:description),
+        ancillary: Array(load(:ancillary)).compact,
         default: load_default
       ]
 
@@ -72,6 +72,13 @@ module Sod
       return unless argument && !argument.start_with?("[") && default
 
       fail Error, "Required argument can't be used with default."
+    end
+
+    def load attribute
+      klass = self.class
+      fallback = klass.instance_variable_get(:@attributes)[attribute]
+
+      klass.instance_variable_get("@#{attribute}") || fallback
     end
 
     def load_default

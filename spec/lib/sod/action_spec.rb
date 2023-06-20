@@ -70,13 +70,48 @@ RSpec.describe Sod::Action do
   end
 
   describe ".on" do
-    it "record attributes when defined" do
+    it "records attributes when defined" do
       action = Class.new(described_class) { on %w[-t --test] }
                     .new
       expect(action.record).to eq(Sod::Models::Action[aliases: %w[-t --test], ancillary: []])
     end
 
-    it "record with no attributes when undefined" do
+    it "records attributes only when macros aren't defined" do
+      implementation = Class.new described_class do
+        on "--test", argument: "[TEST]", default: "test", description: "Test.", ancillary: "Extra."
+      end
+
+      expect(implementation.new.record).to eq(
+        Sod::Models::Action[
+          aliases: %w[--test],
+          argument: "[TEST]",
+          default: "test",
+          description: "Test.",
+          ancillary: ["Extra."]
+        ]
+      )
+    end
+
+    it "overwrites attributes when macros are defined" do
+      implementation = Class.new described_class do
+        description "Description override."
+        ancillary "Ancillary override."
+        default { "Default override." }
+        on "--test", argument: "[TEST]", default: "test", description: "Test.", ancillary: "Extra."
+      end
+
+      expect(implementation.new.record).to eq(
+        Sod::Models::Action[
+          aliases: %w[--test],
+          argument: "[TEST]",
+          default: "Default override.",
+          description: "Description override.",
+          ancillary: ["Ancillary override."]
+        ]
+      )
+    end
+
+    it "records no attributes when undefined" do
       action = Class.new(described_class).new
       expect(action.record).to eq(Sod::Models::Action[ancillary: []])
     end
