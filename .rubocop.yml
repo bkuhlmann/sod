@@ -1,6 +1,9 @@
 inherit_gem:
   caliber: config/all.yml
 
+Metrics/AbcSize:
+  AllowedMethods:
+    - "process"
 Metrics/ParameterLists:
   Exclude:
     - "lib/sod/models/action.rb"

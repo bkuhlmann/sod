@@ -14,3 +14,8 @@ detectors:
   ModuleInitialize:
     exclude:
       - "Sod::Models"
+  TooManyStatements:
+    exclude:
+      - "Sod::Graph::Node#initialize"
+      - "Sod::Graph::Node#process"
+      - "Sod::Presenters::Node#initialize"

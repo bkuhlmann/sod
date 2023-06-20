@@ -28,14 +28,12 @@ module Sod
 
       def get_child(*lineage, node: self) = lineage.empty? ? node : get(lineage, node, __method__)
 
-      def on(object, *, **, &block)
+      def on(object, *, **, &)
         lineage.clear if depth.zero?
 
         process(object, *, **)
-
-        increment
-        instance_eval(&block) if block
-        decrement
+        visit(&)
+        self
       end
 
       def call = (operation.call if operation)
@@ -46,8 +44,6 @@ module Sod
 
       attr_accessor :depth
 
-      # :reek:TooManyStatements
-      # rubocop:todo Metrics/AbcSize
       def process(object, *, **)
         ancestry = object.is_a?(Class) ? object.ancestors : []
 
@@ -61,7 +57,6 @@ module Sod
           fail Error, "Invalid command or action. Unable to add: #{object.inspect}."
         end
       end
-      # rubocop:enable Metrics/AbcSize
 
       def add_inline_command handle, *positionals
         description, *ancillary = positionals
@@ -97,6 +92,12 @@ module Sod
         fail Error, "Unable to find command or action: #{handle.inspect}." unless node
 
         public_send(message, *lineage, node:)
+      end
+
+      def visit &block
+        increment
+        instance_eval(&block) if block
+        decrement
       end
 
       def increment = self.depth += 1

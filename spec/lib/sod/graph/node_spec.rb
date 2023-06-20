@@ -239,6 +239,16 @@ RSpec.describe Sod::Graph::Node do
       )
     end
 
+    it "answers itself" do
+      expect(node.on(:one, "One.")).to eq(
+        described_class[
+          handle: "test",
+          description: "Test 0.0.0",
+          children: Set[described_class[handle: :one, description: "One."]]
+        ]
+      )
+    end
+
     it "fails with no arguments" do
       expectation = proc { node.on }
       expect(&expectation).to raise_error(ArgumentError)
