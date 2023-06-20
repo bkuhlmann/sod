@@ -5,23 +5,28 @@ require "spec_helper"
 RSpec.describe Sod::Action do
   subject(:action) { implementation.new }
 
-  let(:implementation) { Class.new described_class }
+  let(:implementation) { Class.new(described_class) { on "--test" } }
 
   describe ".description" do
     it "answers string when defined" do
-      action = Class.new(described_class) { description "A test." }
-                    .new
-      expect(action.description).to eq("A test.")
+      action = Class.new described_class do
+        on "--test"
+        description "A test."
+      end
+
+      expect(action.new.description).to eq("A test.")
     end
 
     it "answers nil when undefined" do
-      action = Class.new(described_class).new
+      action = Class.new(described_class) { on "--test" }
+                    .new
       expect(action.description).to be(nil)
     end
 
     it "fails when defined more than once" do
       expectation = proc do
         Class.new described_class do
+          on "--test"
           description "One"
           description "Two"
         end
@@ -33,24 +38,30 @@ RSpec.describe Sod::Action do
 
   describe ".ancillary" do
     it "answers array with single item" do
-      action = Class.new(described_class) { ancillary "A test." }
-                    .new
+      action = Class.new described_class do
+        on "--test"
+        ancillary "A test."
+      end
 
-      expect(action.ancillary).to eq(["A test."])
+      expect(action.new.ancillary).to eq(["A test."])
     end
 
     it "answers array with multiple items" do
-      action = Class.new(described_class) { ancillary "One.", "Two." }
-                    .new
+      action = Class.new described_class do
+        on "--test"
+        ancillary "One.", "Two."
+      end
 
-      expect(action.ancillary).to eq(%w[One. Two.])
+      expect(action.new.ancillary).to eq(%w[One. Two.])
     end
 
     it "answers array with nils removed" do
-      action = Class.new(described_class) { ancillary "One.", nil }
-                    .new
+      action = Class.new described_class do
+        on "--test"
+        ancillary "One.", nil
+      end
 
-      expect(action.ancillary).to eq(["One."])
+      expect(action.new.ancillary).to eq(["One."])
     end
 
     it "answers emtpy array when undefined" do
@@ -60,6 +71,8 @@ RSpec.describe Sod::Action do
     it "fails when defined more than once" do
       expectation = proc do
         Class.new described_class do
+          on "--test"
+
           ancillary "One"
           ancillary "Two"
         end
@@ -111,9 +124,8 @@ RSpec.describe Sod::Action do
       )
     end
 
-    it "records no attributes when undefined" do
-      action = Class.new(described_class).new
-      expect(action.record).to eq(Sod::Models::Action[ancillary: []])
+    it "records only aliases when all other attributes are undefined" do
+      expect(action.record).to eq(Sod::Models::Action[aliases: ["--test"], ancillary: []])
     end
 
     it "fails when defined more than once" do
@@ -130,12 +142,16 @@ RSpec.describe Sod::Action do
 
   describe ".default" do
     it "answers content when defined" do
-      implementation = Class.new(described_class) { default { "test" } }
-      expect(implementation.new.default).to eq("test")
+      action = Class.new described_class do
+        on "--test"
+        default { "test" }
+      end
+
+      expect(action.new.default).to eq("test")
     end
 
     it "answers nil when undefined" do
-      implementation = Class.new described_class
+      implementation = Class.new(described_class) { on "--test" }
       expect(implementation.new.default).to be(nil)
     end
 
@@ -152,6 +168,11 @@ RSpec.describe Sod::Action do
   end
 
   describe "#initialize" do
+    it "fails without aliases" do
+      expectation = proc do Class.new(described_class).new end
+      expect(&expectation).to raise_error(Sod::Error, "Aliases must be defined.")
+    end
+
     it "fails when required argument is used with default" do
       expectation = proc do
         Class.new(described_class) { on "--test", argument: "TEXT", default: "test" }
@@ -197,7 +218,7 @@ RSpec.describe Sod::Action do
 
   describe "#record" do
     it "answers record" do
-      expect(action.record).to eq(Sod::Models::Action[ancillary: []])
+      expect(action.record).to eq(Sod::Models::Action[aliases: ["--test"], ancillary: []])
     end
   end
 
@@ -223,10 +244,10 @@ RSpec.describe Sod::Action do
       end
     end
 
-    it "answers empty attributes with no customization" do
+    it "answers only aliases with no further customization" do
       expect(action.inspect).to match(
         /
-          \#<\#<Class:.+>\s@context=\#<Sod::Context:.+>\saliases=nil,\sargument=nil,\s
+          \#<\#<Class:.+>\s@context=\#<Sod::Context:.+>\saliases=\["--test"\],\sargument=nil,\s
           type=nil,\sallow=nil,\sdefault=nil,\sdescription=nil,\sancillary=\[\]>
         /x
       )
@@ -271,8 +292,8 @@ RSpec.describe Sod::Action do
       end
     end
 
-    it "answers empty array with no customization" do
-      expect(action.to_a).to eq([])
+    it "answers only aliases with no further customization" do
+      expect(action.to_a).to eq(["--test"])
     end
   end
 

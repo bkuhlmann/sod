@@ -47,6 +47,7 @@ module Sod
         default: load_default
       ]
 
+      verify_aliases
       verify_argument
     end
 
@@ -67,6 +68,10 @@ module Sod
     attr_reader :context
 
     private
+
+    def verify_aliases
+      fail Error, "Aliases must be defined." unless aliases
+    end
 
     def verify_argument
       return unless argument && !argument.start_with?("[") && default
