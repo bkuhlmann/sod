@@ -240,11 +240,11 @@ RSpec.describe Sod::Graph::Node do
     end
 
     it "answers itself" do
-      expect(node.on(:one, "One.")).to eq(
+      expect(node.on("one", "One.")).to eq(
         described_class[
           handle: "test",
           description: "Test 0.0.0",
-          children: Set[described_class[handle: :one, description: "One."]]
+          children: Set[described_class[handle: "one", description: "One."]]
         ]
       )
     end

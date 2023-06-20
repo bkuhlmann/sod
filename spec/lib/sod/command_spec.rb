@@ -15,15 +15,10 @@ RSpec.describe Sod::Command do
   end
 
   describe ".handle" do
-    it "answers string when defined" do
+    it "answers handle" do
       command = Class.new(described_class) { handle "test" }
                      .new
       expect(command.handle).to eq("test")
-    end
-
-    it "answers nil when undefined" do
-      command = Class.new(described_class).new
-      expect(command.handle).to be(nil)
     end
 
     it "fails when defined more than once" do
@@ -40,19 +35,24 @@ RSpec.describe Sod::Command do
 
   describe ".description" do
     it "answers string when defined" do
-      command = Class.new(described_class) { description "A test." }
-                     .new
-      expect(command.description).to eq("A test.")
+      command = Class.new described_class do
+        handle "test"
+        description "A test."
+      end
+
+      expect(command.new.description).to eq("A test.")
     end
 
     it "answers nil when undefined" do
-      command = Class.new(described_class).new
+      command = Class.new(described_class) { handle "test" }
+                     .new
       expect(command.description).to be(nil)
     end
 
     it "fails when defined more than once" do
       expectation = proc do
         Class.new described_class do
+          handle "test"
           description "One"
           description "Two"
         end
@@ -64,24 +64,30 @@ RSpec.describe Sod::Command do
 
   describe ".ancillary" do
     it "answers array with single item" do
-      command = Class.new(described_class) { ancillary "A test." }
-                     .new
+      command = Class.new described_class do
+        handle "test"
+        ancillary "A test."
+      end
 
-      expect(command.ancillary).to eq(["A test."])
+      expect(command.new.ancillary).to eq(["A test."])
     end
 
     it "answers array with multiple items" do
-      command = Class.new(described_class) { ancillary "One.", "Two." }
-                     .new
+      command = Class.new described_class do
+        handle "test"
+        ancillary "One.", "Two."
+      end
 
-      expect(command.ancillary).to eq(%w[One. Two.])
+      expect(command.new.ancillary).to eq(%w[One. Two.])
     end
 
     it "answers array with nils removed" do
-      command = Class.new(described_class) { ancillary "One.", nil }
-                     .new
+      command = Class.new described_class do
+        handle "test"
+        ancillary "One.", nil
+      end
 
-      expect(command.ancillary).to eq(["One."])
+      expect(command.new.ancillary).to eq(["One."])
     end
 
     it "answers emtpy array when undefined" do
@@ -102,14 +108,21 @@ RSpec.describe Sod::Command do
 
   describe ".on" do
     it "answers actions when added with positional argument" do
-      command = Class.new(described_class) { on Sod::Prefabs::Actions::Version, "0.0.0" }
-                     .new
-      expect(command.actions).to match(array_including(kind_of(Sod::Prefabs::Actions::Version)))
+      command = Class.new described_class do
+        handle "test"
+        on Sod::Prefabs::Actions::Version, "0.0.0"
+      end
+
+      expect(command.new.actions).to match(array_including(kind_of(Sod::Prefabs::Actions::Version)))
     end
 
     it "answers actions when added with context" do
-      command = Class.new(described_class) { on Sod::Prefabs::Actions::Version }
-                     .new context: Sod::Context[version_label: "0.0.0"]
+      implementation = Class.new described_class do
+        handle "test"
+        on Sod::Prefabs::Actions::Version
+      end
+
+      command = implementation.new context: Sod::Context[version_label: "0.0.0"]
 
       expect(command.actions).to match(array_including(kind_of(Sod::Prefabs::Actions::Version)))
     end
@@ -120,6 +133,8 @@ RSpec.describe Sod::Command do
 
     it "answers deduplicated actions" do
       implementation = Class.new described_class do
+        handle "test"
+
         on Sod::Prefabs::Actions::Version, "0.0.0"
         on Sod::Prefabs::Actions::Version, "0.0.0"
       end
@@ -129,11 +144,31 @@ RSpec.describe Sod::Command do
 
     it "fails when processing unknown actions" do
       expectation = proc do
-        Class.new(described_class) { on "bogus" }
-             .new
+        implementation = Class.new described_class do
+          handle :test
+          on "bogus"
+        end
+
+        implementation.new
       end
 
       expect(&expectation).to raise_error(NoMethodError, /undefined method `new' for "bogus"/)
+    end
+  end
+
+  describe "#initialize" do
+    it "fails with invalid handle" do
+      expectation = proc do
+        Class.new(described_class) { handle 123 }
+             .new
+      end
+
+      expect(&expectation).to raise_error(Sod::Error, "Invalid handle: 123. Must be a string.")
+    end
+
+    it "fails without handle" do
+      expectation = proc { Class.new(described_class).new }
+      expect(&expectation).to raise_error(Sod::Error, "Invalid handle: nil. Must be a string.")
     end
   end
 
@@ -184,11 +219,12 @@ RSpec.describe Sod::Command do
     end
 
     it "answers empty attributes with no customization" do
-      command = Class.new(described_class).new
+      command = Class.new(described_class) { handle "test" }
+                     .new
 
       expect(command.inspect).to match(
         /
-          \#<\#<Class:.+>.+@context=\#<Sod::Context:.+>\shandle=nil,\s
+          \#<\#<Class:.+>.+@context=\#<Sod::Context:.+>\shandle="test",\s
           description=nil,\sancillary=\[\],\sactions=.+Set.+,\soperation=\#<Method.+>
         /x
       )

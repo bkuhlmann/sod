@@ -3,29 +3,22 @@
 require "spec_helper"
 
 RSpec.describe Sod::Presenters::Node do
-  subject(:presenter) { described_class.new record }
+  subject(:presenter) { described_class.new graph }
 
-  let :record do
-    Sod::Graph::Node[
-      handle: "test",
-      description: "Test 0.0.0: A test.",
-      actions: Set[
-        Sod::Prefabs::Actions::Config::Edit.new("test"),
-        Sod::Prefabs::Actions::Version.new("Test 0.0.0")
-      ],
-      ancillary: [],
-      children: Set[command, Sod::Graph::Node[handle: "db", description: "Manage database."]]
-    ]
+  let :graph do
+    Sod::Graph::Node.new(handle: "test", description: "Test 0.0.0: A test.")
+                    .on(Sod::Prefabs::Actions::Config::Edit, "test")
+                    .on(Sod::Prefabs::Actions::Version, "Test 0.0.0")
+                    .on(command)
+                    .on("db", "Manage database.")
   end
 
   let :command do
-    implementation = Class.new Sod::Command do
+    Class.new Sod::Command do
       handle "test"
       description "A test command."
       ancillary "Extra info."
     end
-
-    implementation.new
   end
 
   let(:color) { Sod::Container[:color] }
@@ -55,16 +48,55 @@ RSpec.describe Sod::Presenters::Node do
   end
 
   describe "#to_s" do
-    it "answers banner only" do
-      record.actions.clear
-      record.children.clear
+    it "answers banner only without actions or commands" do
+      graph.actions.clear
+      graph.children.clear
 
       expect(presenter.to_s).to have_color(color, ["Test 0.0.0: A test.", :bold])
     end
 
-    # rubocop:todo RSpec/ExampleLength
+    it "answers commands without descriptions" do
+      command = Class.new(Sod::Command) { handle "one" }
+      graph = Sod::Graph::Node.new(handle: "test", description: "Test 0.0.0: A test.").on(command)
+      presenter = described_class.new graph
+
+      expect(presenter.to_s).to have_color(
+        color,
+        ["Test 0.0.0: A test.", :bold],
+        ["\n\n"],
+        ["USAGE", :bold, :underline],
+        ["\n  "],
+        ["test", :cyan],
+        [" [OPTIONS]\n  "],
+        ["test", :cyan],
+        [" COMMAND [OPTIONS]\n\n\n"],
+        ["COMMANDS", :bold, :underline],
+        ["\n  "],
+        ["one", :cyan]
+      )
+    end
+
+    it "answers actions without descriptions" do
+      action = Class.new(Sod::Action) { on "--test" }
+      graph = Sod::Graph::Node.new(handle: :test, description: "Test 0.0.0: A test.").on(action)
+      presenter = described_class.new graph
+
+      expect(presenter.to_s).to have_color(
+        color,
+        ["Test 0.0.0: A test.", :bold],
+        ["\n\n"],
+        ["USAGE", :bold, :underline],
+        ["\n  "],
+        ["test", :cyan],
+        [" [OPTIONS]\n\n"],
+        ["OPTIONS", :bold, :underline],
+        ["\n  "],
+        ["--test", :cyan]
+      )
+    end
+
     it "answers banner, usage, and options only" do
-      record.children.clear
+      graph.children.clear
 
       expect(presenter.to_s).to have_color(
         color,
@@ -86,9 +118,7 @@ RSpec.describe Sod::Presenters::Node do
         ["     Show version."]
       )
     end
-    # rubocop:enable RSpec/ExampleLength
 
-    # rubocop:todo RSpec/ExampleLength
     it "answers banner, usage, options, and, commands" do
       expect(presenter.to_s).to have_color(
         color,
@@ -118,6 +148,5 @@ RSpec.describe Sod::Presenters::Node do
         ["                Manage database."]
       )
     end
-    # rubocop:enable RSpec/ExampleLength
   end
 end

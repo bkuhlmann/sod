@@ -13,3 +13,4 @@ RSpec/FilePath:
 RSpec/ExampleLength:
   Exclude:
     - "spec/lib/sod/action_spec.rb"
+    - "spec/lib/sod/presenters/node_spec.rb"

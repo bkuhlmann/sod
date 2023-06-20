@@ -35,16 +35,10 @@ module Sod
 
     def initialize(context: Context::EMPTY, model: Models::Command, **)
       super(**)
-      klass = self.class
       @context = context
+      @record = build_record model
 
-      @record = model[
-        handle: klass.instance_variable_get(:@handle),
-        description: klass.instance_variable_get(:@description),
-        ancillary: Array(klass.instance_variable_get(:@ancillary)).compact,
-        actions: Set[*build_actions],
-        operation: method(:call)
-      ]
+      verify_handle
     end
 
     def call
@@ -65,10 +59,26 @@ module Sod
 
     private
 
+    def build_record model
+      klass = self.class
+
+      model[
+        handle: klass.instance_variable_get(:@handle),
+        description: klass.instance_variable_get(:@description),
+        ancillary: Array(klass.instance_variable_get(:@ancillary)).compact,
+        actions: Set[*build_actions],
+        operation: method(:call)
+      ]
+    end
+
     def build_actions
       self.class.instance_variable_get(:@actions).map do |action, positionals, keywords|
         action.new(*positionals, **keywords.merge!(context:))
       end
+    end
+
+    def verify_handle
+      fail Error, "Invalid handle: #{handle.inspect}. Must be a string." unless handle in String
     end
   end
 end
