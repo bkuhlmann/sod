@@ -1,5 +1,11 @@
 = Versions
 
+== 0.1.1 (2023-06-22)
+
+* Fixed RuboCop Packaging/BundlerSetupInTests issues - Brooke Kuhlmann
+* Fixed documentation syntax typos - Brooke Kuhlmann
+* Updated Rake RSpec task configuration to not be verbose - Brooke Kuhlmann
+
 == 0.1.0 (2023-06-20)
 
 * Fixed action issue with ignored attributes when macros weren't defined - Brooke Kuhlmann

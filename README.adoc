@@ -220,7 +220,7 @@ Sod.new :demo, banner: "Demo 0.0.0: A demonstration." do
 end
 ----
 
-Despite the `Start`, `Stop`, and `Dump` actions not being implemented yet -- because you'll get a `NameError` if you try -- this does mean you'd have the following functionality available to you from the command line:
+Despite the `Start`, `Stop`, and `Dump` actions not being implemented yet -- because you'll get a `NameError` if you try -- this does mean you'd eventually have the following functionality available from the command line:
 
 [source,bash]
 ----
@@ -240,7 +240,7 @@ Sod.new :demo, banner: "Demo 0.0.0: A demonstration." do
 end
 ----
 
-The first _positional_ argument (i.e. `DB`) is _always_ your action (don't worry, this'll be explained shortly), the second _positional_ argument is the first positional argument to the `DB.new` method followed by the `host` and `port` _keyword_ arguments. In other words, here's what's happening:
+The first _positional_ argument (i.e. `DB`) is _always_ your action, the second _positional_ argument is the first positional argument to the `DB.new` method followed by the `host` and `port` _keyword_ arguments. In other words, here's what's happening:
 
 [source,ruby]
 ----
@@ -257,7 +257,8 @@ DB.new "MyDatabase", host: localhost, port: 5432
 This also means you get the following benefits:
 
 * Lazy initialization of your commands/actions.
-* Any positional and/or keyword arguments will be forwarded to your command/action. Blocks are excluded since they are used by the `on` method for nesting purposes.
+* Quick injection of dependencies or customization of dependencies in general.
+* Automatic forwarding of positional and/or keyword arguments to your command/action. Blocks are excluded since they are used by the `on` method for nesting purposes.
 
 To further understand the DSL, commands, and actions you'll need to start with actions since they are the building blocks.
 
@@ -265,73 +266,192 @@ To further understand the DSL, commands, and actions you'll need to start with a
 
 Actions are the lowest building blocks of the DSL which allow you to quickly implement, test, reuse, and compose more complex architectures. They provide a nice layer atop native `OptionParser#on` functionality.
 
-There are two kinds of actions: custom and prefabricated. We'll start with custom actions and explore prefabricated actions later. Custom actions allow you to define your own functionality by inheriting from `Sod::Action` and leveraging the DSL that comes with it. Here's a high level breakdown of the macros you can use:
+There are two kinds of actions: custom and prefabricated. We'll start with custom actions and explore prefabricated actions later. Custom actions allow you to define your own functionality by inheriting from `Sod::Action` and leveraging the DSL that comes with it.
+
+===== Macros
+
+Here's a high level breakdown of the macros you can use:
 
 * `description`: Optional (but strongly encouraged). Allows you to describe your action and appears within help documentation. If the description is not defined, then only your action's handle (i.e. aliases) will be shown.
 * `ancillary`: Optional. Allows you to provide supplemental text in addition to your description that might be helpful to know about when displaying help documentation. This can accept single or multiple arguments. Order matters since each argument will appear on a separate line in the order listed.
-* `on`: Required. Allows you to define the behavior of your action through keyword arguments. Otherwise, if not defined, the action will be ignored. This macro mimics {option_parser_link} `#on` behavior via the following positional and keyword arguments:
+* `on`: Required. Allows you to define the behavior of your action through keyword arguments. Otherwise, if not defined, you'll get a `Sod::Error` telling you that you must, at a minimum, define some aliases. This macro mimics {option_parser_link} `#on` behavior via the following positional and keyword arguments:
 ** `aliases`: Required. This is a positional argument and defines the short and long form aliases of your action. Your aliases can be a single string (i.e. `on "--version"`) or an array of short and long form aliases. For example, using `on %w[-v --version]` would allow you to use `-v` or `--version` from the command line to call your action. You can also use boolean aliases such as `--build` or `--[no-]build` which the option parser will supply to your `#call` method as a boolean value.
 ** `argument`: Optional. Serves as documentation, must be a string value, and allows the {option_parser_link} to determine if the argument is required or optional. As per the {option_parser_link} documentation, you could use the following values for example:
 *** `TEXT`: Required text.
 *** `[TEXT]`: Optional text.
 *** `a,b,c`: Required list.
 *** `[a,b,c]`: Optional list.
-** `type`: Optional. The type is inferred from your argument but, if you need to be explicit or want to use a custom type not supported by the option parser by default, you can specify the type by providing a primitive. Example: `String`, `Array`, `Hash`, `Date`, etc. You can also use custom types, as provided by this gem, or your own custom type. See {option_parser_link} documentation for details.
+** `type`: Optional. The type is inferred from your argument but, if you need to be explicit or want to use a custom type not supported by default by option parser, you can specify the type by providing a primitive. Example: `String`, `Array`, `Hash`, `Date`, etc. You can also use custom types, provided by this gem and explained later, or implement your own.
 ** `allow`: Optional. Allows you to define what values are allowed as defined via the `argument` or `type` keywords. This can be a string, array, hash, etc. as long as it's compatible with what is defined via the `argument` and/or `type` keyword. This information will also show up in the help documentation as well.
 ** `default`: Optional. Allows you to supply a default value and is a handy for simple values which don't require lazy evaluation via the corresponding default macro. ⚠️ This is ignored if the corresponding macro is used so ensure you use one or the other but not both.
 ** `description`: Optional. Allows you to define a description. Handy for short descriptions that can fit on a single line. Otherwise, for longer descriptions, use the macro. ⚠️ This is ignored if the corresponding macro is used so ensure you use one or the other but not both.
 ** `ancillary`: Optional. Allows you to define ancillary text to supplement your description. It can accept a string or an array. Handy for short, supplementary, text that can fit on a single line. Otherwise, for more verbose details, use the macro. ⚠️ This is ignored if the corresponding macro is used so ensure you use one or the other but not both.
-* `default`: Optional. Uses a block, which is lazy evaluated, so you can define a default value. This is most helpful when used in combination with an _optional_ `argument` and/or `type` which can fallback to a safe default. This information shows up in the help text where the value will be rendered green text. In the case of booleans, they will be rendered as green for `true` and red for `false`.
+* `default`: Optional. Uses a block which lazy evaluates and resolves your value. This is most helpful when used in combination with an _optional_ `argument` and/or `type` which can fallback to a safe default. This information shows up in the help text where the value is rendered as green text. In the case of booleans, they will be rendered as green for `true` and red for `false`.
 
-At a minimum, you want to define the `description` and `on` macros while implementing the `#call` message. Here's an example of implementing an action that echoes input as output:
+With the above in mind, let's look at a few examples of what you can do when you put all of this together.
+
+===== Booleans
+
+Boolean flags are long alases only, take _no arguments_, and use `[no-]` syntax after the double dashes. Here's a minimal implementation:
 
 [source,ruby]
 ----
-class Echo < Sod::Action
-  description "Echo input as output."
+class Demo < Sod::Action
+  on "--[no-]run"
 
+  def call(value) = puts "Got: #{value}"
+end
+
+cli = Sod.new { on Demo }
+
+cli.call %w[--run]     # "Got: true"
+cli.call %w[--no-run]  # "Got: false"
+----
+
+Because a value is always provided when using a boolean flag, you can make it a required positional parameter via your method definition (i.e. `call(value)`). You don't need to worry about type safety because {option_parser_link} will either pass in a `true` or `false` value as you can see from the output above.
+
+===== Arguments
+
+Arguments inform {option_parser_link} how to parse values as either _optional_ or _required_. Here's minimal implementation of an optional argument:
+
+[source,ruby]
+----
+class Demo < Sod::Action
+  on %w[-e --echo], argument: "[TEXT]"
+
+  def call(text = nil) = puts "Got: #{text}"
+end
+
+cli = Sod.new { on Demo }
+
+cli.call %w[-e]         # "Got: "
+cli.call %w[--echo]     # "Got: "
+cli.call %w[-e hi]      # "Got: hi"
+cli.call %w[--echo hi]  # "Got: hi"
+----
+
+The method definition of `call(text = nil)` is important because if you call the action directly you'd want to have a safe default that mirrors the `on` macro. You could provide a non-nil default but we'll discuss this more later. You could also use a `call(text)` method definition since {option_parser_link} will always give you a value even if it is `nil`. You can see see how this behavior plays out in the examples above. On the flip side, when you need a _required_ argument, simply drop the brackets (i.e. `[]`). Here's an example:
+
+[source,ruby]
+----
+class Demo < Sod::Action
   on %w[-e --echo], argument: "TEXT"
 
-  def call(text) = puts text
+  def call(text) = puts "Got: #{text}"
 end
 
-cli = Sod.new :demo, banner: "Demo 0.0.0: A demonstration" do
-  on Echo
-  on Sod::Prefabs::Actions::Help, self
-end
+cli = Sod.new { on Demo }
+
+cli.call %w[-e]         # "🛑 Missing argument: -e"
+cli.call %w[--echo]     # "🛑 Missing argument: --echo"
+cli.call %w[-e hi]      # "Got: hi"
+cli.call %w[--echo hi]  # "Got: hi"
 ----
 
-If we run the above implementation with different inputs, we'll get multiple outputs:
+There are only three major differences between the earlier _optional_ example and the above _required_ example:
+
+* The argument is required because it's not wrapped in brackets.
+* The method definition requires a `text` parameter.
+* You get an error when not providing an argument.
+
+===== Types
+
+Types are optional but worth having when you need the safety check. Here's a minimal example:
 
 [source,ruby]
 ----
-cli.call
+class Demo < Sod::Action
+  on %w[-e --echo], argument: "NUMBER", type: Float
 
-# Demo 0.0.0: A demonstration
-#
-# USAGE
-#   demo [OPTIONS]
-#
-# OPTIONS
-#   -e, --echo TEXT          Echo input as output.
-#   -h, --help [COMMAND]     Show this message.
-#
-# cli.call %w[--echo hello]
+  def call(number) = puts "Got: #{number}"
+end
 
-cli.call %w[--echo hello]
+cli = Sod.new { on Demo }
 
-# hello
-
-cli.call %s[--e hello]
-
-# hello
-
-cli.call ["--echo"]
-
-# 🛑 Missing argument for: --echo.
+cli.call %w[--echo 123]   # "Got: 123.0"
+cli.call %w[--echo 1.5]   # "Got: 1.5"
+cli.call %w[--echo hi]  # 🛑 Invalid argument: --echo hi
 ----
 
-As you can see, the description shows up in the help text while the `-e` and `--echo` aliases can be used interchangeably. We only get the missing argument error when the argument (i.e. `"TEXT"`) isn't supplied. Finally, when the action is called, we see that the `"hello"` text is outputted to the console for use. Here's an updated version of the above implementation which leverages all features:
+Notice the type is a `Float` where only the first two examples work but the last one ends in an error because {option_parser_link} can't cast the raw input to a float.
+
+===== Allows
+
+Allows give you the ability to define what is acceptable as input and need to match your type (if you supply one). Here's a minimal example:
+
+[source,ruby]
+----
+class Demo < Sod::Action
+  on %w[-e --echo], argument: "TEXT", allow: %w[hi hello]
+
+  def call(text) = puts "Got: #{text}"
+end
+
+cli = Sod.new { on Demo }
+
+cli.call %w[--echo hi]     # "Got: hi"
+cli.call %w[--echo hello]  # "Got: hello"
+cli.call %w[--echo test]   # "🛑 Invalid argument: --echo test"
+----
+
+Here you can see the first two examples pass while the last one fails because `"test"` isn't a valid value within the allowed array.
+
+===== Defaults
+
+Defaults are not something that {option_parser_link} supports out-of-the-box but are handy for documentation purposes and within your implementation as fallback values. Here's a minimal example:
+
+[source,ruby]
+----
+class Demo < Sod::Action
+  on %w[-e --echo], argument: "[TEXT]", default: "fallback"
+
+  def call(text = nil) = puts "Got: #{text || default}"
+end
+
+cli = Sod.new { on Demo }
+
+cli.call %w[--echo]     # "Got: fallback"
+cli.call %w[--echo hi]  # "Got: hi"
+----
+
+Notice how the default is printed when no value is given but is overwritten when an actual value is supplied. This is the correct way to handle defaults but might not be what you are used to. If you're thinking that you'd rather write the implementation like this:
+
+[source,ruby]
+----
+def call(text = default) = puts "Got: #{text}"
+----
+
+...you'd not be wrong. In fact, if you initialized and called the action, you'd get what you'd expect:
+
+[source,ruby]
+----
+demo = Demo.new
+
+demo.call       # "Got: fallback"
+demo.call "hi"  # "Got: hi"
+----
+
+The reason the above is a problem is because {option_parser_link} ignores _optional_ parameters and all keywords. Here's the fully modified example:
+
+[source,ruby]
+----
+class Demo < Sod::Action
+  on %w[-e --echo], argument: "[TEXT]", default: "fallback"
+
+  def call(text = default) = puts "Got: #{text}"
+end
+
+cli = Sod.new { on Demo }
+
+cli.call %w[--echo]     # "Got: "
+cli.call %w[--echo hi]  # "Got: hi"
+----
+
+Notice how there is surprising behavior with the first result (i.e. an empty string). This is because when {option_parser_link} completely ignores the value of the _optional_ parameter. I've logged an link:https://github.com/ruby/optparse/issues/55[issue] if you want to know more. For now, be aware of this quirk as it can be confusing if you are not familiar with {option_parser_link}.
+
+===== Examples
+
+The following are a few more examples, in case it helps, with the first leveraging all features:
 
 [source,ruby]
 ----
@@ -406,7 +526,7 @@ cli.call ["--echo"]
 # `Echo#call [[:rest, :*]]` must be implemented. (NotImplementedError)
 ----
 
-At a minimum, as shown from the error above, your `#call` method needs to allow the forwarding of positional arguments which means you can use `def call(*)` if you want to ignore arguments or define which arguments you care about and ignore the rest. Up to you. Also, _all_ of the information defined within your action is available to you within the instance. Here's an example action which inspects itself:
+At a minimum, your `#call` method needs to allow the forwarding of positional arguments which means you can use `def call(*)` if you want to ignore arguments or define which arguments you care about and ignore the rest. Up to you. Also, _all_ of the information defined within your action is available to you within the instance. Here's an example action which inspects itself:
 
 [source,ruby]
 ----
@@ -683,7 +803,7 @@ end
 
 ==== Types
 
-Types are a way to extend default {option_parser_link} functionality. Two types -- not provided by {option_parser_link} -- worth being aware of are:
+Types are a way to extend default {option_parser_link} functionality. Here are a few types -- not provided by {option_parser_link} -- worth knowing about:
 
 **Pathname**
 
@@ -714,6 +834,27 @@ class Demo < Sod::Action
   on "--version", argument: "VERSION", type: Versionaire::Version
 end
 ----
+
+**Custom**
+
+Creating a custom type requires minimal effort and can be implemented in only a few files:
+
+[source,ruby]
+----
+# lib/my_type.rb
+
+MyType = -> value { # Implementation details go here. }
+----
+
+[source,ruby]
+----
+# lib/extensions/option_parser.rb
+require "optparse"
+
+OptionParser.accept(MyType) { |value| MyType.call value }
+----
+
+Once you've implemented a custom type, you are then free to require and reference it within the DSL.
 
 ==== Prefabrications
 
@@ -757,7 +898,7 @@ This action is most useful when building customizable CLIs where you want users 
 
 ===== Help
 
-By now you should be familiar with the help action which allows you to print CLI documentation for users of your CLI. This action consumes the entire graph (i.e. `self`) of information in order to render documentation. You'll want to add this by default or customize with your own help action should you not like the default functionality. Anything is possible. Here's how to use:
+By now you should be familiar with the help action which allows you to print CLI documentation for users of your CLI. This action consumes the entire graph (i.e. `self`) of information in order to render documentation. You'll want to add this by default or customize with your own help action should you not like the default functionality. Anything is possible. Here's some usage:
 
 [source,ruby]
 ----
