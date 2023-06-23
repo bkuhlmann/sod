@@ -9,7 +9,7 @@
 :hanamismith_link: link:https://alchemists.io/projects/hanamismith[Hanamismith]
 :infusible_link: link:https://alchemists.io/projects/infusible[Infusible]
 :milestoner_link: link:https://alchemists.io/projects/milestoner[Milestoner]
-:option_parser_link: link:https://rubyapi.org/o/s?q=OptionParser[Option Parser]
+:option_parser_link: link:https://alchemists.io/articles/ruby_option_parser[Option Parser]
 :pennyworth_link: link:https://alchemists.io/projects/pennyworth[Pennyworth]
 :pragmater_link: link:https://alchemists.io/projects/pragmater[Pragmater]
 :rubysmith_link: link:https://alchemists.io/projects/rubysmith[Rubysmith]
@@ -41,11 +41,11 @@ toc::[]
 
 *DSL*
 
-image::https://alchemists.io/images/projects/sod/screenshots/dsl.png[A screenshot of the DSL syntax,width=539,height=479,role=focal_point]
+image::https://alchemists.io/images/projects/sod/screenshots/dsl.png[A screenshot of the DSL syntax,width=667,height=607,role=focal_point]
 
 *Output*
 
-image::https://alchemists.io/images/projects/sod/screenshots/output.png[A screenshot of the generated help documentation,width=472,height=498,role=focal_point]
+image::https://alchemists.io/images/projects/sod/screenshots/output.png[A screenshot of the generated help documentation,width=596,height=662,role=focal_point]
 
 == Requirements
 
@@ -312,7 +312,7 @@ Because a value is always provided when using a boolean flag, you can make it a 
 
 ===== Arguments
 
-Arguments inform {option_parser_link} how to parse values as either _optional_ or _required_. Here's minimal implementation of an optional argument:
+Arguments inform {option_parser_link} how to parse values as either _optional_ or _required_. Here's a minimal implementation of an optional argument:
 
 [source,ruby]
 ----
