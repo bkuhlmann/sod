@@ -10,9 +10,9 @@ module Sod
 
     include Import[:logger]
 
-    def self.inherited subclass
+    def self.inherited descendant
       super
-      subclass.class_eval { @actions = Set.new }
+      descendant.class_eval { @actions = Set.new }
     end
 
     def self.handle text
