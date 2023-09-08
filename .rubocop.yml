@@ -7,10 +7,10 @@ Metrics/AbcSize:
 Metrics/ParameterLists:
   Exclude:
     - "lib/sod/models/action.rb"
-RSpec/FilePath:
-  Exclude:
-    - "spec/lib/sod/types/pathname_spec.rb"
 RSpec/ExampleLength:
   Exclude:
     - "spec/lib/sod/action_spec.rb"
     - "spec/lib/sod/presenters/node_spec.rb"
+RSpec/SpecFilePathFormat:
+  Exclude:
+    - "spec/lib/sod/types/pathname_spec.rb"
