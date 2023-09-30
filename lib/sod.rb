@@ -11,5 +11,7 @@ end
 
 # Main namespace.
 module Sod
+  def self.loader(registry = Zeitwerk::Registry) = registry.loader_for __FILE__
+
   def self.new(...) = Shell.new(...)
 end
