@@ -2,8 +2,10 @@
 
 require "zeitwerk"
 
-Zeitwerk::Loader.for_gem.then do |loader|
+Zeitwerk::Loader.new.then do |loader|
   loader.ignore "#{__dir__}/sod/types"
+  loader.tag = File.basename __FILE__, ".rb"
+  loader.push_dir __dir__
   loader.setup
 end
 
