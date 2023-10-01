@@ -1,5 +1,14 @@
 = Versions
 
+== 0.2.0 (2023-09-30)
+
+* Fixed Zeitwerk loader - Brooke Kuhlmann
+* Added gem loader - Brooke Kuhlmann
+* Updated GitHub issue template with simplified sections - Brooke Kuhlmann
+* Updated documentation option parser link and screenshots - Brooke Kuhlmann
+* Refactored RuboCop RSpec/FilePath as RSpec/SpecFilePathFormat - Brooke Kuhlmann
+* Refactored inherited terminology to use descendant - Brooke Kuhlmann
+
 == 0.1.1 (2023-06-22)
 
 * Fixed RuboCop Packaging/BundlerSetupInTests issues - Brooke Kuhlmann
