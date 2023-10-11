@@ -169,7 +169,7 @@ RSpec.describe Sod::Action do
 
   describe "#initialize" do
     it "fails without aliases" do
-      expectation = proc do Class.new(described_class).new end
+      expectation = proc { Class.new(described_class).new }
       expect(&expectation).to raise_error(Sod::Error, "Aliases must be defined.")
     end
 
