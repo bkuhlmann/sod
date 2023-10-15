@@ -1,5 +1,13 @@
 = Versions
 
+== 0.3.0 (2023-10-15)
+
+* Fixed RuboCop Style/SingleLineDoEndBlock issue - Brooke Kuhlmann
+* Updated to Caliber 0.42.0 - Brooke Kuhlmann
+* Updated to Cogger 0.12.0 - Brooke Kuhlmann
+* Updated to Infusible 2.2.0 - Brooke Kuhlmann
+* Refactored Gemfile to use ruby file syntax - Brooke Kuhlmann
+
 == 0.2.0 (2023-09-30)
 
 * Fixed Zeitwerk loader - Brooke Kuhlmann
