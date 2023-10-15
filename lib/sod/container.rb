@@ -13,6 +13,6 @@ module Sod
     register(:client) { OptionParser.new nil, 40, "  " }
     register(:color) { Tone.new }
     register(:kernel) { Kernel }
-    register(:logger) { Cogger.new formatter: :emoji }
+    register(:logger) { Cogger.new id: :sod }
   end
 end

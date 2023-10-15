@@ -7,7 +7,7 @@ RSpec.shared_context "with application dependencies" do
   using Infusible::Stub
 
   let(:kernel) { class_spy Kernel }
-  let(:logger) { Cogger.new io: StringIO.new, level: :debug, formatter: :emoji }
+  let(:logger) { Cogger.new id: :sod, io: StringIO.new, level: :debug }
 
   before { Sod::Import.stub kernel:, logger: }
 
