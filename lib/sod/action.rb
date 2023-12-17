@@ -83,7 +83,7 @@ module Sod
       klass = self.class
       fallback = klass.instance_variable_get(:@attributes)[attribute]
 
-      klass.instance_variable_get("@#{attribute}") || fallback
+      klass.instance_variable_get(:"@#{attribute}") || fallback
     end
 
     def load_default
