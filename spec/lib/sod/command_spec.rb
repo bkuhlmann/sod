@@ -144,15 +144,14 @@ RSpec.describe Sod::Command do
 
     it "fails when processing unknown actions" do
       expectation = proc do
-        implementation = Class.new described_class do
-          handle :test
-          on "bogus"
-        end
-
-        implementation.new
+        Class.new(described_class) { on "bogus" }
+             .new
       end
 
-      expect(&expectation).to raise_error(NoMethodError, /undefined method `new' for "bogus"/)
+      expect(&expectation).to raise_error(
+        NoMethodError,
+        /undefined method `new' for an instance of String/
+      )
     end
   end
 
