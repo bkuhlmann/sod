@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 require "forwardable"
-require "refinements/arrays"
+require "refinements/array"
 
 module Sod
   module Presenters
@@ -11,7 +11,7 @@ module Sod
 
       extend Forwardable
 
-      using Refinements::Arrays
+      using Refinements::Array
 
       delegate [*Models::Action.members, :handle] => :record
 

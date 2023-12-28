@@ -3,7 +3,7 @@
 require "spec_helper"
 
 RSpec.describe Sod::Graph::Runner do
-  using Refinements::Loggers
+  using Refinements::Logger
 
   subject(:runner) { described_class.new graph }
 

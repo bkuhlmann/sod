@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-require "refinements/pathnames"
+require "refinements/pathname"
 
 module Sod
   module Prefabs
@@ -10,7 +10,7 @@ module Sod
         class View < Action
           include Import[:kernel, :logger]
 
-          using Refinements::Pathnames
+          using Refinements::Pathname
 
           description "View project configuration."
 

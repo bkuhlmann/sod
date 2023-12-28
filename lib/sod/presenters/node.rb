@@ -1,8 +1,8 @@
 # frozen_string_literal: true
 
 require "forwardable"
-require "refinements/arrays"
-require "refinements/strings"
+require "refinements/array"
+require "refinements/string"
 
 module Sod
   module Presenters
@@ -13,8 +13,8 @@ module Sod
 
       extend Forwardable
 
-      using Refinements::Arrays
-      using Refinements::Strings
+      using Refinements::Array
+      using Refinements::String
 
       delegate %i[handle description ancillary operation children] => :node
 

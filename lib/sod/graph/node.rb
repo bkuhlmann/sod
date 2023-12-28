@@ -1,12 +1,12 @@
 # frozen_string_literal: true
 
-require "refinements/arrays"
+require "refinements/array"
 
 module Sod
   module Graph
     # A generic graph node (and DSL) from which to build multiple lineages with.
     Node = Struct.new :handle, :description, :ancillary, :actions, :operation, :children do
-      using Refinements::Arrays
+      using Refinements::Array
 
       def initialize(**)
         super

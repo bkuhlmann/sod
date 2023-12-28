@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-require "refinements/arrays"
+require "refinements/array"
 
 module Sod
   module Models
@@ -14,7 +14,7 @@ module Sod
       :description,
       :ancillary
     ) do
-      using Refinements::Arrays
+      using Refinements::Array
 
       def initialize aliases: nil,
                      argument: nil,

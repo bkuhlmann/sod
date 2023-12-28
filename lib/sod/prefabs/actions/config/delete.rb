@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
-require "refinements/pathnames"
-require "refinements/strings"
+require "refinements/pathname"
+require "refinements/string"
 
 module Sod
   module Prefabs
@@ -11,8 +11,8 @@ module Sod
         class Delete < Action
           include Import[:kernel, :logger]
 
-          using Refinements::Pathnames
-          using Refinements::Strings
+          using Refinements::Pathname
+          using Refinements::String
 
           description "Delete project configuration."
 

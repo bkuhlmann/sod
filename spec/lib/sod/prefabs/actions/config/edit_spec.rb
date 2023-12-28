@@ -4,7 +4,7 @@ require "runcom"
 require "spec_helper"
 
 RSpec.describe Sod::Prefabs::Actions::Config::Edit do
-  using Refinements::Loggers
+  using Refinements::Logger
 
   subject(:action) { described_class.new path }
 

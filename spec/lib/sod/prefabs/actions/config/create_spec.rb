@@ -4,8 +4,8 @@ require "runcom"
 require "spec_helper"
 
 RSpec.describe Sod::Prefabs::Actions::Config::Create do
-  using Refinements::Loggers
-  using Refinements::Pathnames
+  using Refinements::Logger
+  using Refinements::Pathname
 
   subject(:action) { described_class.new xdg_config, defaults_path: }
 

@@ -3,8 +3,8 @@
 require "spec_helper"
 
 RSpec.describe Sod::Prefabs::Actions::Config::Delete do
-  using Refinements::Loggers
-  using Refinements::Pathnames
+  using Refinements::Logger
+  using Refinements::Pathname
 
   subject(:action) { described_class.new path }
 
