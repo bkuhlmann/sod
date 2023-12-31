@@ -50,7 +50,8 @@ module Sod
                          .map { |key, value| "#{key}=#{value.inspect}" }
                          .join ", "
 
-      "#<#{self.class} @logger=#{logger.inspect} @context=#{context.inspect} #{attributes}>"
+      "#<#{self.class}:#{object_id} @logger=#{logger.inspect} @context=#{context.inspect} " \
+      "#{attributes}>"
     end
 
     protected

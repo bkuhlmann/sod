@@ -236,7 +236,7 @@ RSpec.describe Sod::Action do
       it "answers attributes" do
         expect(action.new.inspect).to match(
           /
-            \#<\#<Class:.+>\s@context=\#<Sod::Context:.+>\saliases=\["-b",\s"--build"\],\s
+            \#<\#<Class:.+>:\d+\s@context=\#<Sod::Context:.+>\saliases=\["-b",\s"--build"\],\s
             argument="\[NAME\]",\stype=String,\sallow="demo",\sdefault="default",\s
             description="A\stest\.",\sancillary=\["Usage."\]>
           /x
@@ -247,7 +247,7 @@ RSpec.describe Sod::Action do
     it "answers only aliases with no further customization" do
       expect(action.inspect).to match(
         /
-          \#<\#<Class:.+>\s@context=\#<Sod::Context:.+>\saliases=\["--test"\],\sargument=nil,\s
+          \#<\#<Class:.+>:\d+\s@context=\#<Sod::Context:.+>\saliases=\["--test"\],\sargument=nil,\s
           type=nil,\sallow=nil,\sdefault=nil,\sdescription=nil,\sancillary=\[\]>
         /x
       )

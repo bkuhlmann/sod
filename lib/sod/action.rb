@@ -58,7 +58,7 @@ module Sod
 
     def inspect
       attributes = record.to_h.map { |key, value| "#{key}=#{value.inspect}" }
-      %(#<#{self.class} @context=#{context.inspect} #{attributes.join ", "}>)
+      %(#<#{self.class}:#{object_id} @context=#{context.inspect} #{attributes.join ", "}>)
     end
 
     def to_proc = method(:call).to_proc
