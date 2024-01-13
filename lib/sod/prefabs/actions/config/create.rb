@@ -36,8 +36,7 @@ module Sod
           def check_defaults
             return true if defaults_path.exist?
 
-            logger.fatal { "Default configuration doesn't exist: #{defaults_path.to_s.inspect}." }
-            kernel.abort
+            logger.abort "Default configuration doesn't exist: #{defaults_path.to_s.inspect}."
             false
           end
 

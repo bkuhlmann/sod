@@ -36,18 +36,14 @@ RSpec.describe Sod::Prefabs::Actions::Config::View do
       expect(logger.reread).to include("Viewing (#{path.to_s.inspect}):")
     end
 
-    it "logs error when it doesn't exist" do
+    it "aborts when path doesn't exist" do
       path.delete
-      action.call
+      logger = instance_spy Cogger::Hub
+      described_class.new(path, logger:).call
 
-      expect(logger.reread).to match(/🛑.+Configuration doesn't exist: #{path.to_s.inspect}.+/)
-    end
-
-    it "aborts when it doesn't exist" do
-      path.delete
-      action.call
-
-      expect(kernel).to have_received(:abort)
+      expect(logger).to have_received(:abort).with(
+        "Configuration doesn't exist: #{path.to_s.inspect}."
+      )
     end
 
     it "fails with no label or context" do

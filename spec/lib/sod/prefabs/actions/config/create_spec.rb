@@ -19,17 +19,11 @@ RSpec.describe Sod::Prefabs::Actions::Config::Create do
   describe "#call" do
     it "aborts when defaults don't exist" do
       defaults_path.delete
-      action.call
+      logger = instance_spy Cogger::Hub
+      described_class.new(xdg_config, defaults_path:, logger:).call
 
-      expect(kernel).to have_received(:abort)
-    end
-
-    it "logs fatal when defaults don't exist" do
-      defaults_path.delete
-      action.call
-
-      expect(logger.reread).to match(
-        /🔥.+Default configuration doesn't exist: #{defaults_path.to_s.inspect}.+/
+      expect(logger).to have_received(:abort).with(
+        "Default configuration doesn't exist: #{defaults_path.to_s.inspect}."
       )
     end
 

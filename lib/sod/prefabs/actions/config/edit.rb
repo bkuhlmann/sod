@@ -36,8 +36,7 @@ module Sod
           def check
             return true if path.exist?
 
-            logger.error { "Configuration doesn't exist: #{path.to_s.inspect}." }
-            kernel.abort
+            logger.abort "Configuration doesn't exist: #{path.to_s.inspect}."
             false
           end
         end
