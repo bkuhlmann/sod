@@ -1,5 +1,11 @@
 = Versions
 
+== 0.5.0 (2024-01-13)
+
+* 🔼 Updated to Cogger 0.16.0 - Brooke Kuhlmann
+* 🔼 Updated to Git Lint 7.0.0 - Brooke Kuhlmann
+* 🔁 Refactored config prefabrications to use logger abort - Brooke Kuhlmann
+
 == 0.4.0 (2024-01-01)
 
 * Fixed RuboCop Performance/StringIdentifierArgument issue - Brooke Kuhlmann
