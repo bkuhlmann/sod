@@ -16,7 +16,7 @@ RSpec.describe Sod do
 
   describe ".new" do
     it "answers shell" do
-      expect(described_class.new).to be_a(Sod::Shell)
+      expect(described_class.new).to be_a(described_class::Shell)
     end
   end
 end
