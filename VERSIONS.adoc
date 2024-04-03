@@ -1,5 +1,12 @@
 = Versions
 
+== 0.8.0 (2024-04-03)
+
+* 🟢 Added Containable gem - Brooke Kuhlmann
+* 🔼 Updated implementation to use Containable - Brooke Kuhlmann
+* 🔼 Updated to Infusible 3.5.0 - Brooke Kuhlmann
+* ⛔️ Removed Dry Container gem - Brooke Kuhlmann
+
 == 0.7.0 (2024-03-26)
 
 * 🔼 Updated setup script as a Ruby script - Brooke Kuhlmann
