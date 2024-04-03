@@ -25,7 +25,7 @@ Gem::Specification.new do |spec|
   spec.required_ruby_version = "~> 3.3"
   spec.add_dependency "cogger", "~> 0.16"
   spec.add_dependency "containable", "~> 0.0"
-  spec.add_dependency "infusible", "~> 3.4"
+  spec.add_dependency "infusible", "~> 3.5"
   spec.add_dependency "refinements", "~> 12.1"
   spec.add_dependency "tone", "~> 1.0"
   spec.add_dependency "zeitwerk", "~> 2.6"
