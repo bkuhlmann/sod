@@ -212,7 +212,7 @@ RSpec.describe Sod::Action do
   describe "#call" do
     it "fails when not implemented" do
       expectation = proc { action.call "test" }
-      expect(&expectation).to raise_error(NotImplementedError, /#call.+must be implemented/)
+      expect(&expectation).to raise_error(NoMethodError, /#call.+must be implemented/)
     end
   end
 
@@ -304,7 +304,7 @@ RSpec.describe Sod::Action do
 
     it "fails when not implemented" do
       expectation = proc { action.to_proc.call "test" }
-      expect(&expectation).to raise_error(NotImplementedError, /must be implemented/)
+      expect(&expectation).to raise_error(NoMethodError, /must be implemented/)
     end
   end
 end

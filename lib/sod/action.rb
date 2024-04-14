@@ -52,7 +52,7 @@ module Sod
     end
 
     def call(*)
-      fail NotImplementedError,
+      fail NoMethodError,
            "`#{self.class}##{__method__} #{method(__method__).parameters}` must be implemented."
     end
 

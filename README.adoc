@@ -523,7 +523,7 @@ end
 
 cli.call ["--echo"]
 
-# `Echo#call [[:rest, :*]]` must be implemented. (NotImplementedError)
+# `Echo#call [[:rest, :*]]` must be implemented. (NoMethodError)
 ----
 
 At a minimum, your `#call` method needs to allow the forwarding of positional arguments which means you can use `def call(*)` if you want to ignore arguments or define which arguments you care about and ignore the rest. Up to you. Also, _all_ of the information defined within your action is available to you within the instance. Here's an example action which inspects itself:
