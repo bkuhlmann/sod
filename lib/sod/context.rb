@@ -19,7 +19,7 @@ module Sod
 
     def to_h = attributes.dup
 
-    def method_missing(name, *) = respond_to_missing?(name) ? attributes[name] : super(name, *)
+    def method_missing(name, *) = respond_to_missing?(name) ? attributes[name] : super
 
     private
 
