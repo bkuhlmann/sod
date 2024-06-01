@@ -1,5 +1,13 @@
 = Versions
 
+== 0.10.0 (2024-06-01)
+
+* ✅ Fixed RuboCop Style/SuperArguments issue - Brooke Kuhlmann
+* 🟢 Added IRB Kit gem - Brooke Kuhlmann
+* 🔼 Updated RSpec configuration to ignore backtraces in pending specs - Brooke Kuhlmann
+* 🔼 Updated citation URLs - Brooke Kuhlmann
+* 🔼 Updated to Ruby 3.3.2 - Brooke Kuhlmann
+
 == 0.9.0 (2024-05-02)
 
 * ✅ Fixed not implemented errors to be no method errors instead - Brooke Kuhlmann
