@@ -26,7 +26,7 @@ Gem::Specification.new do |spec|
   spec.add_dependency "cogger", "~> 0.21"
   spec.add_dependency "containable", "~> 0.0"
   spec.add_dependency "infusible", "~> 3.5"
-  spec.add_dependency "refinements", "~> 12.1"
+  spec.add_dependency "refinements", "~> 12.5"
   spec.add_dependency "tone", "~> 1.0"
   spec.add_dependency "zeitwerk", "~> 2.6"
 
