@@ -3,6 +3,8 @@
 require "spec_helper"
 
 RSpec.describe Sod::Prefabs::Actions::Help do
+  using Refinements::StringIO
+
   subject(:help) { described_class.new graph }
 
   include_context "with application dependencies"
@@ -33,7 +35,7 @@ RSpec.describe Sod::Prefabs::Actions::Help do
     it "answers banner, usage, options, and commands with no arguments by default" do
       help.call
 
-      expect(kernel).to have_received(:puts).with(<<~TEXT.strip)
+      expect(io.reread).to eq(<<~TEXT)
         \e[1mTest 0.0.0\e[0m
 
         \e[1;4mUSAGE\e[0m
@@ -53,7 +55,7 @@ RSpec.describe Sod::Prefabs::Actions::Help do
     it "answers banner, usage, options, and commands for basic command" do
       help.call "db"
 
-      expect(kernel).to have_received(:puts).with(<<~TEXT.strip)
+      expect(io.reread).to eq(<<~TEXT)
         \e[1mManage database.\e[0m
 
         \e[1;4mUSAGE\e[0m
@@ -72,7 +74,7 @@ RSpec.describe Sod::Prefabs::Actions::Help do
     it "answers banner, usage, options, and commands for advanced command" do
       help.call "analyze"
 
-      expect(kernel).to have_received(:puts).with(<<~TEXT.strip)
+      expect(io.reread).to eq(<<~TEXT)
         \e[1mAnalyze structure.\e[0m
 
         \e[1;4mUSAGE\e[0m
@@ -85,15 +87,15 @@ RSpec.describe Sod::Prefabs::Actions::Help do
 
     it "answers only description for empty command" do
       help.call "generate"
-      expect(kernel).to have_received(:puts).with("\e[1mGenerate skeleton.\e[0m")
+      expect(io.reread).to eq("\e[1mGenerate skeleton.\e[0m\n")
     end
 
     it "answers only banner for empty graph" do
       graph = Sod::Graph::Node[handle: "test", description: "Test 0.0.0"]
-      help = described_class.new(graph, kernel:)
+      help = described_class.new(graph, io:)
       help.call
 
-      expect(kernel).to have_received(:puts).with("\e[1mTest 0.0.0\e[0m")
+      expect(io.reread).to eq("\e[1mTest 0.0.0\e[0m\n")
     end
   end
 end

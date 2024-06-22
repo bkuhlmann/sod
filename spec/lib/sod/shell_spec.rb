@@ -3,7 +3,11 @@
 require "spec_helper"
 
 RSpec.describe Sod::Shell do
+  using Refinements::StringIO
+
   subject(:shell) { described_class.new { on Sod::Prefabs::Actions::Version, "Test 0.0.0" } }
+
+  include_context "with application dependencies"
 
   describe "#initialize" do
     it "answers shell with default name and no banner" do
@@ -31,8 +35,8 @@ RSpec.describe Sod::Shell do
     end
 
     it "responds to action" do
-      expectation = proc { shell.call ["--version"] }
-      expect(&expectation).to output("Test 0.0.0\n").to_stdout
+      shell.call ["--version"]
+      expect(io.reread).to eq("Test 0.0.0\n")
     end
   end
 end

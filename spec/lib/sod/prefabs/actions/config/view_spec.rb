@@ -5,6 +5,7 @@ require "spec_helper"
 
 RSpec.describe Sod::Prefabs::Actions::Config::View do
   using Refinements::Logger
+  using Refinements::StringIO
 
   subject(:action) { described_class.new path }
 
@@ -18,17 +19,17 @@ RSpec.describe Sod::Prefabs::Actions::Config::View do
 
     it "views when path exists" do
       action.call
-      expect(kernel).to have_received(:puts).with("label: Test")
+      expect(io.reread).to eq("label: Test\n")
     end
 
     it "views when context exists" do
       described_class.new(context: Sod::Context[xdg_config: Runcom::Config.new(path)]).call
-      expect(kernel).to have_received(:puts).with("label: Test")
+      expect(io.reread).to eq("label: Test\n")
     end
 
     it "views when given both label and context" do
       described_class.new(path, context: Sod::Context[xdg_path: "n/a"]).call
-      expect(kernel).to have_received(:puts).with("label: Test")
+      expect(io.reread).to eq("label: Test\n")
     end
 
     it "logs info when viewing" do

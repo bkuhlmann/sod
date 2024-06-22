@@ -5,7 +5,7 @@ module Sod
     module Actions
       # Provides a generic version action for use in upstream applications.
       class Version < Action
-        include Import[:kernel]
+        include Import[:io]
 
         description "Show version."
 
@@ -16,7 +16,7 @@ module Sod
           @label = context[label, :version_label]
         end
 
-        def call(*) = kernel.puts label
+        def call(*) = io.puts label
 
         private
 

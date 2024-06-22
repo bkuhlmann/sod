@@ -5,7 +5,7 @@ module Sod
     module Actions
       # Displays help (usage) information.
       class Help < Action
-        include Import[:kernel]
+        include Import[:io]
 
         description "Show this message."
 
@@ -19,9 +19,9 @@ module Sod
 
         def call *lineage
           if lineage.empty?
-            kernel.puts presenter.new(graph).to_s
+            io.puts presenter.new(graph).to_s
           else
-            kernel.puts presenter.new(graph.get_child(*lineage)).to_s
+            io.puts presenter.new(graph.get_child(*lineage)).to_s
           end
         end
 

@@ -8,7 +8,7 @@ module Sod
       module Config
         # Displays project configuration.
         class View < Action
-          include Import[:kernel, :logger]
+          include Import[:logger, :io]
 
           using Refinements::Pathname
 
@@ -26,7 +26,7 @@ module Sod
             return unless check
 
             logger.info { "Viewing (#{path.to_s.inspect}):" }
-            kernel.puts path.read
+            io.puts path.read
           end
 
           private
