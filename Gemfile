@@ -20,7 +20,7 @@ end
 group :test do
   gem "guard-rspec", "~> 4.7", require: false
   gem "rspec", "~> 3.13"
-  gem "runcom", "~> 11.0"
+  gem "runcom", "~> 11.5"
 end
 
 group :tools do
