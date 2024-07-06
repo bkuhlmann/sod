@@ -642,7 +642,7 @@ cli.call ["demo", "--one", "--no-two"]
 # {:one => true, :two => false}
 ----
 
-You might be thinking: "Hey, that's more lines of code!" True but -- more importantly -- you get the benefit of composible and reusable architectures -- because each command/action is encapsulated -- which you don't get with {option_parser_link}. You'll also notice that the `input` hash is mutated. The fact that you have to mutate input is a bummer and you should strive to avoid mutation whenever you can. In this case, mutation is necessary because the underlining architecture of the {option_parser_link} doesn't provide any other way to share state amongst your commands and actions. So this is one example of how you can do that.
+You might be thinking: "Hey, that's more lines of code!" True but -- more importantly -- you get the benefit of composable and reusable architectures -- because each command/action is encapsulated -- which you don't get with {option_parser_link}. You'll also notice that the `input` hash is mutated. The fact that you have to mutate input is a bummer and you should strive to avoid mutation whenever you can. In this case, mutation is necessary because the underlining architecture of the {option_parser_link} doesn't provide any other way to share state amongst your commands and actions. So this is one example of how you can do that.
 
 As mentioned earlier with actions, commands share a similar DSL with a few differences in terms of macros:
 
@@ -976,13 +976,13 @@ class Stop < Sod::Action
 end
 
 class Echo < Sod::Action
-  include Sod::Import[:kernel]
+  include Sod::Import[:io]
 
   description "Echo input as output."
 
   on %w[-e --echo], argument: "TEXT"
 
-  def call(text) = kernel.puts text
+  def call(text) = io.puts text
 end
 
 cli = Sod.new :demo, banner: "Demo 0.0.0: A demonstration." do

@@ -1,5 +1,11 @@
 = Versions
 
+== 0.12.0 (2024-07-06)
+
+🟢 Added version release notes - Brooke Kuhlmann
+🔼 Updated implementation to use I/O instead of Kernel where appropriate - Brooke Kuhlmann
+🔼 Updated to Containable 0.2.0 - Brooke Kuhlmann
+
 == 0.11.0 (2024-07-01)
 
 * 🔼 Updated to Caliber 0.58.0 - Brooke Kuhlmann
