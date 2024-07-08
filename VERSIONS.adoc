@@ -1,5 +1,11 @@
 = Versions
 
+== 0.13.0 (2024-07-08)
+
+* 🔼 Updated to Git Lint 8.0.0 - Brooke Kuhlmann
+* 🔼 Updated to Infusible 3.8.0 - Brooke Kuhlmann
+* 🔼 Updated to Runcom 11.5.0 - Brooke Kuhlmann
+
 == 0.12.0 (2024-07-06)
 
 🟢 Added version release notes - Brooke Kuhlmann
