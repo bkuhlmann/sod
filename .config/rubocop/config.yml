@@ -7,6 +7,7 @@ Metrics/AbcSize:
 Metrics/ParameterLists:
   Exclude:
     - "lib/sod/models/action.rb"
+    - "lib/sod/refines/option_parser.rb"
 RSpec/ExampleLength:
   Exclude:
     - "spec/lib/sod/action_spec.rb"

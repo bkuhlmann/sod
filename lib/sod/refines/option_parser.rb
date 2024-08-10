@@ -7,8 +7,8 @@ module Sod
     # Provides additional enhancements to the option parser primitive.
     module OptionParser
       refine ::OptionParser do
-        def order!(argument = default_argv, into: nil, command: nil, &)
-          super(argument, into:, &)
+        def order!(argument = default_argv, into: nil, command: nil, **, &)
+          super(argument, into:, **, &)
           command.call if command
         end
 
