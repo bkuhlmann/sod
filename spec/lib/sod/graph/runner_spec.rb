@@ -37,8 +37,7 @@ RSpec.describe Sod::Graph::Runner do
 
         default { "default" }
 
-        # :reek:ControlParameter
-        def call(value) = io.puts(value || default)
+        def call(value = default) = io.puts value
       end
     end
 

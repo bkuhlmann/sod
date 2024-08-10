@@ -48,10 +48,21 @@ module Sod
           usage(*arguments)
         else
           parser, node = registry.fetch lineage, client
+          alter_callback_for parser
+
           parser.order! arguments, command: node do |command|
             lineage.concat(" ", command).tap(&:strip!)
             visit arguments
           end
+        end
+      end
+
+      # :reek:FeatureEnvy
+      def alter_callback_for parser
+        parser.define_singleton_method :callback! do |function, max_arity, *positionals|
+          return function.call if function.arity == -1 && positionals.empty?
+
+          super(function, max_arity, *positionals)
         end
       end
 
