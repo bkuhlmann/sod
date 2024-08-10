@@ -2,7 +2,7 @@
 
 require "spec_helper"
 
-RSpec.describe Sod::Refines::OptionParsers do
+RSpec.describe Sod::Refines::OptionParser do
   using described_class
 
   subject(:parser) { OptionParser.new "Test" }

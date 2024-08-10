@@ -6,7 +6,7 @@ module Sod
     class Loader
       include Import[:client]
 
-      using Refines::OptionParsers
+      using Refines::OptionParser
 
       def initialize(graph, **)
         super(**)

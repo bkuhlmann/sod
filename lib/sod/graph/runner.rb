@@ -6,7 +6,7 @@ module Sod
     class Runner
       include Import[:client, :logger]
 
-      using Refines::OptionParsers
+      using Refines::OptionParser
 
       HELP_PATTERN = /
         \A       # Start of string.
