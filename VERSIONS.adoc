@@ -1,5 +1,16 @@
 = Versions
 
+== 0.14.0 (2024-08-11)
+
+* 🟢 Added version release notes - Brooke Kuhlmann
+* 🔼 Updated option parser refinement to include keyword arguments - Brooke Kuhlmann
+* 🔼 Updated runner to alter option parser callback - Brooke Kuhlmann
+* 🔼 Updated to Option Parser 0.5.0 - Brooke Kuhlmann
+* 🔼 Updated to Refinements 12.7.0 - Brooke Kuhlmann
+* 🔼 Updated to Ruby 3.3.4 - Brooke Kuhlmann
+* ⛔️ Removed Guard - Brooke Kuhlmann
+* 🔁 Refactored option parser refinement as singular - Brooke Kuhlmann
+
 == 0.13.0 (2024-07-08)
 
 * 🔼 Updated to Git Lint 8.0.0 - Brooke Kuhlmann

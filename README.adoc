@@ -292,23 +292,43 @@ With the above in mind, let's look at a few examples of what you can do when you
 
 ===== Booleans
 
-Boolean flags are long alases only, take _no arguments_, and use `[no-]` syntax after the double dashes. Here's a minimal implementation:
+Boolean are long alases only, use `[no-]` syntax after the double dashes, and provide the boolean value for use within your action. Here's a minimal implementation:
 
 [source,ruby]
 ----
-class Demo < Sod::Action
+class Action < Sod::Action
   on "--[no-]run"
 
-  def call(value) = puts "Got: #{value}"
+  def call(boolean) = puts boolean
 end
 
-cli = Sod.new { on Demo }
+cli = Sod.new { on Action }
 
-cli.call %w[--run]     # "Got: true"
-cli.call %w[--no-run]  # "Got: false"
+cli.call %w[--run]     # "true"
+cli.call %w[--no-run]  # "false"
 ----
 
-Because a value is always provided when using a boolean flag, you can make it a required positional parameter via your method definition (i.e. `call(value)`). You don't need to worry about type safety because {option_parser_link} will either pass in a `true` or `false` value as you can see from the output above.
+Because a value is always provided when using a boolean flag, you can make it a required positional parameter via your method definition (i.e. `call(boolean)`). You don't need to worry about type safety because {option_parser_link} will pass in `true` or `false` as you can see from the output above.
+
+===== Flags
+
+Flags are similar to _Booleans_ but take _no arguments_ and allow short or long aliases. When a flag is supplied, the action is _enabled_ which means you can execute custom functionality. Otherwise, when a flag isn't supplied (i.e. default), then the action is _disabled_ and nothing happens.
+
+[source,ruby]
+----
+class Action < Sod::Action
+  on %w[-m --max]
+
+  def call(*) = puts "Maximum enabled."
+end
+
+cli = Sod.new { on Action }
+
+cli.call %w[--max]  # "Maximum enabled."
+cli.call            # Nothing happens.
+----
+
+Since `#call` expects an argument, you can use `call(+*+)` for the method signature to ignore all arguments since you don't need them.
 
 ===== Arguments
 
@@ -316,13 +336,13 @@ Arguments inform {option_parser_link} how to parse values as either _optional_ o
 
 [source,ruby]
 ----
-class Demo < Sod::Action
+class Action < Sod::Action
   on %w[-e --echo], argument: "[TEXT]"
 
   def call(text = nil) = puts "Got: #{text}"
 end
 
-cli = Sod.new { on Demo }
+cli = Sod.new { on Action }
 
 cli.call %w[-e]         # "Got: "
 cli.call %w[--echo]     # "Got: "
@@ -334,13 +354,13 @@ The method definition of `call(text = nil)` is important because if you call the
 
 [source,ruby]
 ----
-class Demo < Sod::Action
+class Action < Sod::Action
   on %w[-e --echo], argument: "TEXT"
 
   def call(text) = puts "Got: #{text}"
 end
 
-cli = Sod.new { on Demo }
+cli = Sod.new { on Action }
 
 cli.call %w[-e]         # "🛑 Missing argument: -e"
 cli.call %w[--echo]     # "🛑 Missing argument: --echo"
@@ -348,10 +368,10 @@ cli.call %w[-e hi]      # "Got: hi"
 cli.call %w[--echo hi]  # "Got: hi"
 ----
 
-There are only three major differences between the earlier _optional_ example and the above _required_ example:
+There are three major differences between a _required_ and _optional_ argument:
 
 * The argument is required because it's not wrapped in brackets.
-* The method definition requires a `text` parameter.
+* The method definition requires a parameter (i.e. `text` in the above example).
 * You get an error when not providing an argument.
 
 ===== Types
@@ -360,13 +380,13 @@ Types are optional but worth having when you need the safety check. Here's a min
 
 [source,ruby]
 ----
-class Demo < Sod::Action
+class Action < Sod::Action
   on %w[-e --echo], argument: "NUMBER", type: Float
 
   def call(number) = puts "Got: #{number}"
 end
 
-cli = Sod.new { on Demo }
+cli = Sod.new { on Action }
 
 cli.call %w[--echo 123]   # "Got: 123.0"
 cli.call %w[--echo 1.5]   # "Got: 1.5"
@@ -381,13 +401,13 @@ Allows give you the ability to define what is acceptable as input and need to ma
 
 [source,ruby]
 ----
-class Demo < Sod::Action
+class Action < Sod::Action
   on %w[-e --echo], argument: "TEXT", allow: %w[hi hello]
 
   def call(text) = puts "Got: #{text}"
 end
 
-cli = Sod.new { on Demo }
+cli = Sod.new { on Action }
 
 cli.call %w[--echo hi]     # "Got: hi"
 cli.call %w[--echo hello]  # "Got: hello"
@@ -398,56 +418,25 @@ Here you can see the first two examples pass while the last one fails because `"
 
 ===== Defaults
 
-Defaults are not something that {option_parser_link} supports out-of-the-box but are handy for documentation purposes and within your implementation as fallback values. Here's a minimal example:
+Defaults are not supported by {option_parser_link} but are handy for documentation purposes and within your implementation as fallback values. Here's a minimal example:
 
 [source,ruby]
 ----
-class Demo < Sod::Action
-  on %w[-e --echo], argument: "[TEXT]", default: "fallback"
-
-  def call(text = nil) = puts "Got: #{text || default}"
-end
-
-cli = Sod.new { on Demo }
-
-cli.call %w[--echo]     # "Got: fallback"
-cli.call %w[--echo hi]  # "Got: hi"
-----
-
-Notice how the default is printed when no value is given but is overwritten when an actual value is supplied. This is the correct way to handle defaults but might not be what you are used to. If you're thinking that you'd rather write the implementation like this:
-
-[source,ruby]
-----
-def call(text = default) = puts "Got: #{text}"
-----
-
-...you'd not be wrong. In fact, if you initialized and called the action, you'd get what you'd expect:
-
-[source,ruby]
-----
-demo = Demo.new
-
-demo.call       # "Got: fallback"
-demo.call "hi"  # "Got: hi"
-----
-
-The reason the above is a problem is because {option_parser_link} ignores _optional_ parameters and all keywords. Here's the fully modified example:
-
-[source,ruby]
-----
-class Demo < Sod::Action
+class Action < Sod::Action
   on %w[-e --echo], argument: "[TEXT]", default: "fallback"
 
   def call(text = default) = puts "Got: #{text}"
 end
 
-cli = Sod.new { on Demo }
+cli = Sod.new { on Action }
 
-cli.call %w[--echo]     # "Got: "
+cli.call %w[--echo]     # "Got: fallback"
 cli.call %w[--echo hi]  # "Got: hi"
 ----
 
-Notice how there is surprising behavior with the first result (i.e. an empty string). This is because when {option_parser_link} completely ignores the value of the _optional_ parameter. I've logged an link:https://github.com/ruby/optparse/issues/55[issue] if you want to know more. For now, be aware of this quirk as it can be confusing if you are not familiar with {option_parser_link}.
+Notice how the default is printed when no value is given but is overwritten when an actual value is supplied.
+
+💡 If you need to lazy compute a default value, then use the block syntax instead.
 
 ===== Examples
 
@@ -464,7 +453,7 @@ class Echo < Sod::Action
 
   default { "hello" }
 
-  def call(text = nil) = puts(text || default)
+  def call(text = default) = puts text
 end
 
 cli = Sod.new :demo, banner: "Demo 0.0.0: A demonstration" do
@@ -737,7 +726,9 @@ class Demo < Sod::Command
 end
 ----
 
-One major difference between _reusable_ and _inline_ commands is that _reusable_ commands allow you implement a `#call` method. This method is optional, so if you don't need it, you don't have to implement it. However, if you do, this means you can process the input from your actions. This method is called _after_ the option parser has parsed all command line input for your actions which gives you a handy way to process all collected input via a single command. 💡 This is how the {rubysmith_link}, {gemsmith_link}, and {hanamismith_link} gems all build new Ruby projects for you based on the actions passed to them via the CLI.
+One major difference between _reusable_ and _inline_ commands is that _reusable_ commands allow you implement a `#call` method. This method is optional, so if you don't need it, you don't have to implement it. However, if you do, this means you can process the input from your actions. This method is called _after_ the option parser has parsed all command line input for your actions which gives you a handy way to process all collected input via a single command.
+
+💡 This is how the {rubysmith_link}, {gemsmith_link}, and {hanamismith_link} gems all build new Ruby projects for you based on the actions passed to them via the CLI.
 
 ==== Initialization
 
@@ -775,7 +766,7 @@ context = Sod::Context.new defaults_path: "path/to/defaults.yml", version_label:
 context = Sod::Context[defaults_path: "path/to/defaults.yml", version_label: "Demo 0.0.0"]
 ----
 
-Once you have an instance, you can use it as follows:
+Once you have an instance, you can use as follows:
 
 [source,ruby]
 ----
@@ -805,7 +796,7 @@ end
 
 Types are a way to extend default {option_parser_link} functionality. Here are a few types -- not provided by {option_parser_link} -- worth knowing about:
 
-**Pathname**
+===== Pathname
 
 Provided by this gem and must be manually required since it's disabled by default. Example:
 
@@ -821,7 +812,7 @@ end
 
 With the above, you'll always get a link:https://rubyapi.org/o/s?q=Pathname[Pathname] instance as input to your action.
 
-**Version**
+===== Version
 
 Provided via the {versionaire_link} gem which gives you a `Version` type when dealing with link:https://semver.org[semantic versions]. Here's how to leverage it:
 
@@ -835,7 +826,7 @@ class Demo < Sod::Action
 end
 ----
 
-**Custom**
+===== Custom
 
 Creating a custom type requires minimal effort and can be implemented in only a few files:
 
