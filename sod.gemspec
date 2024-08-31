@@ -12,7 +12,7 @@ Gem::Specification.new do |spec|
   spec.metadata = {
     "bug_tracker_uri" => "https://github.com/bkuhlmann/sod/issues",
     "changelog_uri" => "https://alchemists.io/projects/sod/versions",
-    "documentation_uri" => "https://alchemists.io/projects/sod",
+    "homepage_uri" => "https://alchemists.io/projects/sod",
     "funding_uri" => "https://github.com/sponsors/bkuhlmann",
     "label" => "Sod",
     "rubygems_mfa_required" => "true",
