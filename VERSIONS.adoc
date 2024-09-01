@@ -127,7 +127,7 @@
 * Updated graph node to answer itself - Brooke Kuhlmann
 * Updated to Caliber 0.35.0 - Brooke Kuhlmann
 * Updated to Git Lint 6.0.0 - Brooke Kuhlmann
-* Refactored action and command inherted callback terminology - Brooke Kuhlmann
+* Refactored action and command inherited callback terminology - Brooke Kuhlmann
 * Refactored context override terminology - Brooke Kuhlmann
 
 == 0.0.0 (2023-06-15)
