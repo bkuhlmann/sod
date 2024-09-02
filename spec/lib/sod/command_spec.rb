@@ -90,7 +90,7 @@ RSpec.describe Sod::Command do
       expect(command.new.ancillary).to eq(["One."])
     end
 
-    it "answers emtpy array when undefined" do
+    it "answers empty array when undefined" do
       expect(command.ancillary).to eq([])
     end
 

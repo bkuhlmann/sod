@@ -64,7 +64,7 @@ RSpec.describe Sod::Action do
       expect(action.new.ancillary).to eq(["One."])
     end
 
-    it "answers emtpy array when undefined" do
+    it "answers empty array when undefined" do
       expect(action.ancillary).to eq([])
     end
 
