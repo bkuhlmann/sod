@@ -1,5 +1,11 @@
 = Versions
 
+== 0.19.0 (2024-11-08)
+
+* ✅ Fixed option parser callback processing of value - Brooke Kuhlmann
+* 🔼 Updated to Option Parser 0.6.0 - Brooke Kuhlmann
+* 🔼 Updated to Ruby 3.3.6 - Brooke Kuhlmann
+
 == 0.18.0 (2024-11-04)
 
 * 🔼 Updated to Cogger 0.30.0 - Brooke Kuhlmann
