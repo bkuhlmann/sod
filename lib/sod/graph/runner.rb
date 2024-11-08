@@ -59,10 +59,10 @@ module Sod
 
       # :reek:FeatureEnvy
       def alter_callback_for parser
-        parser.define_singleton_method :callback! do |function, max_arity, *positionals|
-          return function.call if function.arity == -1 && positionals.empty?
+        parser.define_singleton_method :callback! do |function, max_arity, value|
+          return function.call if function.arity == -1 && !value
 
-          super(function, max_arity, *positionals)
+          super(function, max_arity, value)
         end
       end
 
