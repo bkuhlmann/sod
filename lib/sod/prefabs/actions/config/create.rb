@@ -8,7 +8,7 @@ module Sod
       module Config
         # Creates project configuration.
         class Create < Action
-          include Import[:kernel, :logger]
+          include Dependencies[:kernel, :logger]
 
           using Refinements::Pathname
 

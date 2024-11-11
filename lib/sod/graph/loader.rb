@@ -4,7 +4,7 @@ module Sod
   module Graph
     # Loads and decorates option parsers within graph.
     class Loader
-      include Import[:client]
+      include Dependencies[:client]
 
       using Refines::OptionParser
 

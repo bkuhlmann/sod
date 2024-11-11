@@ -5,7 +5,7 @@ module Sod
     module Actions
       # Displays help (usage) information.
       class Help < Action
-        include Import[:io]
+        include Dependencies[:io]
 
         description "Show this message."
 

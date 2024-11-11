@@ -4,7 +4,7 @@ module Sod
   module Graph
     # Runs the appropriate parser for given command line arguments.
     class Runner
-      include Import[:client, :logger]
+      include Dependencies[:client, :logger]
 
       using Refines::OptionParser
 

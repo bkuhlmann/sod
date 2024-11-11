@@ -7,7 +7,7 @@ module Sod
   module Presenters
     # Aids in rendering an action for display.
     class Action
-      include Import[:color]
+      include Dependencies[:color]
 
       extend Forwardable
 

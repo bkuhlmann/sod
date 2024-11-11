@@ -17,7 +17,7 @@ RSpec.describe Sod::Graph::Runner do
       inspector = inspect
 
       Class.new Sod::Command do
-        include Sod::Import[:io]
+        include Sod::Dependencies[:io]
 
         handle "build"
 
@@ -30,7 +30,7 @@ RSpec.describe Sod::Graph::Runner do
 
     let :inspect do
       Class.new Sod::Action do
-        include Sod::Import[:io]
+        include Sod::Dependencies[:io]
 
         on %w[--inspect], argument: "[TEXT]", allow: %w[test demo]
 
@@ -42,7 +42,7 @@ RSpec.describe Sod::Graph::Runner do
 
     let :verify do
       Class.new Sod::Action do
-        include Sod::Import[:io]
+        include Sod::Dependencies[:io]
 
         on %w[--verify], argument: "TEXT"
 
