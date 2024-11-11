@@ -8,7 +8,7 @@ module Sod
   class Command
     extend Forwardable
 
-    include Import[:logger]
+    include Dependencies[:logger]
 
     def self.inherited descendant
       super

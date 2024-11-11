@@ -5,7 +5,7 @@ module Sod
     module Actions
       # Provides a generic version action for use in upstream applications.
       class Version < Action
-        include Import[:io]
+        include Dependencies[:io]
 
         description "Show version."
 

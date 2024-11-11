@@ -3,5 +3,5 @@
 require "infusible"
 
 module Sod
-  Import = Infusible[Container]
+  Dependencies = Infusible[Container]
 end

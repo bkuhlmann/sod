@@ -8,7 +8,7 @@ module Sod
       module Config
         # Edits project configuration.
         class Edit < Action
-          include Import[:kernel, :logger]
+          include Dependencies[:kernel, :logger]
 
           using Refinements::Pathname
 

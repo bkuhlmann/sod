@@ -9,7 +9,7 @@ module Sod
       module Config
         # Deletes project configuration.
         class Delete < Action
-          include Import[:kernel, :logger]
+          include Dependencies[:kernel, :logger]
 
           using Refinements::Pathname
           using Refinements::String

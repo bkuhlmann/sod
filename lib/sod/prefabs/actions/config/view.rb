@@ -8,7 +8,7 @@ module Sod
       module Config
         # Displays project configuration.
         class View < Action
-          include Import[:logger, :io]
+          include Dependencies[:logger, :io]
 
           using Refinements::Pathname
 

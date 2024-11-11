@@ -9,7 +9,7 @@ module Sod
     # Aids in rendering a node for display.
     # :reek:TooManyInstanceVariables
     class Node
-      include Import[:color]
+      include Dependencies[:color]
 
       extend Forwardable
 
