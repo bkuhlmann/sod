@@ -947,7 +947,7 @@ gemfile true do
 end
 
 class Start < Sod::Action
-  include Sod::Import[:logger]
+  include Sod::Dependencies[:logger]
 
   description "Start database."
 
@@ -957,7 +957,7 @@ class Start < Sod::Action
 end
 
 class Stop < Sod::Action
-  include Sod::Import[:logger]
+  include Sod::Dependencies[:logger]
 
   description "Stop database."
 
@@ -967,7 +967,7 @@ class Stop < Sod::Action
 end
 
 class Echo < Sod::Action
-  include Sod::Import[:io]
+  include Sod::Dependencies[:io]
 
   description "Echo input as output."
 
