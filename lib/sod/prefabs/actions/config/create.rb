@@ -18,10 +18,10 @@ module Sod
 
           on %w[-c --create]
 
-          def initialize(xdg_config = nil, defaults_path: nil, **)
+          def initialize(path = nil, xdg_config: nil, **)
             super(**)
             @xdg_config = context[xdg_config, :xdg_config]
-            @defaults_path = Pathname context[defaults_path, :defaults_path]
+            @path = Pathname context[path, :defaults_path]
           end
 
           def call(*)
@@ -31,12 +31,12 @@ module Sod
 
           private
 
-          attr_reader :xdg_config, :defaults_path
+          attr_reader :path, :xdg_config
 
           def check_defaults
-            return true if defaults_path.exist?
+            return true if path.exist?
 
-            logger.abort "Default configuration doesn't exist: #{defaults_path.to_s.inspect}."
+            logger.abort "Default configuration doesn't exist: #{path.to_s.inspect}."
             false
           end
 
@@ -53,15 +53,13 @@ module Sod
           end
 
           # :reek:TooManyStatements
-          def create path
-            path_info = path.to_s.inspect
+          def create xdg_path
+            path_info = xdg_path.to_s.inspect
 
-            if path.exist?
-              logger.warn { "Skipped. Configuration exists: #{path_info}." }
-            else
-              defaults_path.copy path.make_ancestors
-              logger.info { "Created: #{path_info}." }
-            end
+            return logger.warn { "Skipped. Configuration exists: #{path_info}." } if xdg_path.exist?
+
+            path.copy xdg_path.make_ancestors
+            logger.info { "Created: #{path_info}." }
           end
 
           def quit
