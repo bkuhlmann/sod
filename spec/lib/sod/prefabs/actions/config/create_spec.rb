@@ -6,7 +6,7 @@ require "spec_helper"
 RSpec.describe Sod::Prefabs::Actions::Config::Create do
   using Refinements::Pathname
 
-  subject(:action) { described_class.new xdg_config, defaults_path: }
+  subject(:action) { described_class.new defaults_path, xdg_config: }
 
   include_context "with application dependencies"
   include_context "with temporary directory"
@@ -19,7 +19,7 @@ RSpec.describe Sod::Prefabs::Actions::Config::Create do
     it "aborts when defaults don't exist" do
       defaults_path.delete
       logger = instance_spy Cogger::Hub
-      described_class.new(xdg_config, defaults_path:, logger:).call
+      described_class.new(defaults_path, xdg_config:, logger:).call
 
       expect(logger).to have_received(:abort).with(
         "Default configuration doesn't exist: #{defaults_path.to_s.inspect}."
