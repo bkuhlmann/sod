@@ -27,7 +27,7 @@ Gem::Specification.new do |spec|
   spec.add_dependency "containable", "~> 0.2"
   spec.add_dependency "infusible", "~> 3.12"
   spec.add_dependency "optparse", "~> 0.6"
-  spec.add_dependency "refinements", "~> 12.10"
+  spec.add_dependency "refinements", "~> 13.0"
   spec.add_dependency "tone", "~> 1.10"
   spec.add_dependency "zeitwerk", "~> 2.7"
 
