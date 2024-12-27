@@ -150,7 +150,7 @@ RSpec.describe Sod::Command do
 
       expect(&expectation).to raise_error(
         NoMethodError,
-        /undefined method `new' for an instance of String/
+        /undefined method 'new' for an instance of String/
       )
     end
   end
