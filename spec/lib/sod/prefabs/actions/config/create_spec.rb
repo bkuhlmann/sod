@@ -12,7 +12,7 @@ RSpec.describe Sod::Prefabs::Actions::Config::Create do
   include_context "with temporary directory"
 
   let(:path) { temp_dir.join "test.yml" }
-  let(:xdg_config) { Runcom::Config.new path }
+  let(:xdg_config) { instance_double Runcom::Config, global: path, local: path }
   let(:defaults_path) { temp_dir.join("defaults.yml").write "name: test" }
 
   describe "#call" do
@@ -46,19 +46,13 @@ RSpec.describe Sod::Prefabs::Actions::Config::Create do
     end
 
     context "when global" do
-      before do
-        allow(kernel).to receive(:gets).and_return("g\n")
-        allow(xdg_config).to receive(:global).and_return path
-      end
+      before { allow(kernel).to receive(:gets).and_return("g\n") }
 
       it_behaves_like "a created file"
     end
 
     context "when local" do
-      before do
-        allow(kernel).to receive(:gets).and_return("l\n")
-        allow(xdg_config).to receive(:local).and_return path
-      end
+      before { allow(kernel).to receive(:gets).and_return("l\n") }
 
       it_behaves_like "a created file"
     end
