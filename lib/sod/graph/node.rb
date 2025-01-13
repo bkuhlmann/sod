@@ -3,6 +3,7 @@
 require "refinements/array"
 
 module Sod
+  # :reek:DataClump
   module Graph
     # A generic graph node (and DSL) from which to build multiple lineages with.
     Node = Struct.new :handle, :description, :ancillary, :actions, :operation, :children do
@@ -22,6 +23,7 @@ module Sod
         get_actions(*lineage).find { |action| action.handle.include? handle }
       end
 
+      # :reek:DataClump
       def get_actions *lineage, node: self
         lineage.empty? ? node.actions : get(lineage, node, __method__)
       end
