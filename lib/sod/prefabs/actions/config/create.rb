@@ -26,14 +26,14 @@ module Sod
 
           def call(*)
             ARGV.clear
-            check_defaults && choose
+            valid_defaults? && choose
           end
 
           private
 
           attr_reader :path, :xdg_config
 
-          def check_defaults
+          def valid_defaults?
             return true if path.exist?
 
             logger.abort "Default configuration doesn't exist: #{path.to_s.inspect}."

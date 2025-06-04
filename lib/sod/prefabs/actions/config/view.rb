@@ -23,7 +23,7 @@ module Sod
           end
 
           def call(*)
-            return unless check
+            return unless exist?
 
             logger.info { "Viewing (#{path.to_s.inspect}):" }
             io.puts path.read
@@ -33,7 +33,7 @@ module Sod
 
           attr_reader :path
 
-          def check
+          def exist?
             return true if path.exist?
 
             logger.abort "Configuration doesn't exist: #{path.to_s.inspect}."
