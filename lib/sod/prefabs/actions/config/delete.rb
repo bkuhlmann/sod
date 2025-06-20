@@ -40,9 +40,8 @@ module Sod
 
           def confirm
             kernel.print "Are you sure you want to delete #{path_info} (y/n)? "
-            response = kernel.gets.chomp.to_bool
 
-            if response
+            if kernel.gets.chomp.truthy?
               path.delete
               info "Deleted: #{path_info}."
             else
