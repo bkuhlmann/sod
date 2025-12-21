@@ -210,7 +210,7 @@ RSpec.describe Sod::Command do
         expect(command.new.inspect).to match(
           /
             \#<\#<Class:.+>:\d+\s@logger=.+Cogger.+@context=\#<Sod::Context:.+>\shandle="test",\s
-            description="A\stest\.",\sancillary=\["Test\."\],\sactions=.+Set.+,\s
+            description="A\stest\.",\sancillary=\["Test\."\],\sactions=Set\[.+,\s
             operation=\#<Method.+>
           /x
         )
@@ -224,7 +224,7 @@ RSpec.describe Sod::Command do
       expect(command.inspect).to match(
         /
           \#<\#<Class:.+>:\d+\s@logger=.+Cogger.+@context=\#<Sod::Context:.+>\shandle="test",\s
-          description=nil,\sancillary=\[\],\sactions=.+Set.+,\soperation=\#<Method.+>
+          description=nil,\sancillary=\[\],\sactions=Set\[\],\soperation=\#<Method.+>
         /x
       )
     end
