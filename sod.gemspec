@@ -28,7 +28,7 @@ Gem::Specification.new do |spec|
   spec.add_dependency "infusible", "~> 4.0"
   spec.add_dependency "optparse", "~> 0.8"
   spec.add_dependency "refinements", "~> 14.0"
-  spec.add_dependency "tone", "~> 2.0"
+  spec.add_dependency "tone", "~> 3.0"
   spec.add_dependency "zeitwerk", "~> 2.7"
 
   spec.extra_rdoc_files = Dir["README*", "LICENSE*"]
