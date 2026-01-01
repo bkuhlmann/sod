@@ -19,7 +19,7 @@ end
 
 group :test do
   gem "rspec", "~> 3.13"
-  gem "runcom", "~> 12.0"
+  gem "runcom", "~> 13.0"
 end
 
 group :tools do
