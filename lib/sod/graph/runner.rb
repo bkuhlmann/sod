@@ -66,13 +66,13 @@ module Sod
         end
       end
 
-      def usage(*arguments)
+      def usage *arguments
         commands = arguments.grep_v help_pattern
         commands = lineage.split if commands.empty?
         help(*commands)
       end
 
-      def help(*commands)
+      def help *commands
         graph.get_action("help").then { |action| action.call(*commands) if action }
       end
 

@@ -17,11 +17,11 @@ module Sod
       @description ? fail(Error, "Description can only be defined once.") : @description = text
     end
 
-    def self.ancillary(*lines)
+    def self.ancillary *lines
       @ancillary ? fail(Error, "Ancillary can only be defined once.") : @ancillary = lines
     end
 
-    def self.on(aliases, **keywords)
+    def self.on aliases, **keywords
       fail Error, "On can only be defined once." if @attributes.any?
 
       @attributes.merge! keywords, aliases: Array(aliases)

@@ -23,7 +23,7 @@ module Sod
       @description ? fail(Error, "Description can only be defined once.") : @description = text
     end
 
-    def self.ancillary(*lines)
+    def self.ancillary *lines
       @ancillary ? fail(Error, "Ancillary can only be defined once.") : @ancillary = lines
     end
 
