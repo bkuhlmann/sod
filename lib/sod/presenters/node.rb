@@ -20,7 +20,7 @@ module Sod
 
       attr_reader :actions
 
-      # rubocop:todo Metrics/ParameterLists
+      # rubocop:todo-next Metrics/ParameterLists
       def initialize(node, indent: 2, gap: 5, action_presenter: Presenters::Action, **)
         super(**)
         @node = node
@@ -29,7 +29,6 @@ module Sod
         @actions = node.actions.map { |action| action_presenter.new action.record }
         @all = actions + children.to_a
       end
-      # rubocop:enable Metrics/ParameterLists
 
       def to_s
         [banner, body, "", *usage, "", *colored_actions, "", *colored_commands].tap(&:compact!)

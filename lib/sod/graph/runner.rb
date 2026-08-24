@@ -16,7 +16,7 @@ module Sod
         \Z       # End of string.
       /x
 
-      # rubocop:todo Metrics/ParameterLists
+      # rubocop:todo-next Metrics/ParameterLists
       def initialize(graph, help_pattern: HELP_PATTERN, loader: Loader, **)
         super(**)
         @graph = graph
@@ -24,7 +24,6 @@ module Sod
         @help_pattern = help_pattern
         @lineage = +""
       end
-      # rubocop:enable Metrics/ParameterLists
 
       # :reek:DuplicateMethodCall
       # :reek:TooManyStatements
