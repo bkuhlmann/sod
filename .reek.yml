@@ -19,3 +19,5 @@ detectors:
       - "Sod::Graph::Node#initialize"
       - "Sod::Graph::Node#process"
       - "Sod::Presenters::Node#initialize"
+  UnusedParameters:
+    enabled: false
