@@ -4,10 +4,6 @@ module Sod
   module Graph
     # Runs the appropriate parser for given command line arguments.
     class Runner
-      include Dependencies[:client, :logger]
-
-      using Refines::OptionParser
-
       HELP_PATTERN = /
         \A       # Start of string.
         -h       # Short alias.
@@ -15,6 +11,10 @@ module Sod
         --help   # Long alias.
         \Z       # End of string.
       /x
+
+      include Dependencies[:client, :logger]
+
+      using Refines::OptionParser
 
       # rubocop:todo-next Metrics/ParameterLists
       def initialize(graph, help_pattern: HELP_PATTERN, loader: Loader, **)
